@@ -1,0 +1,32 @@
+<html>
+<head>
+  <script src="socket.io/socket.io.js">
+    <script>
+      var socket = new io.Socket('localhost', {port: 8085});
+
+      function connect() {
+      alert("connect");
+      socket.connect();
+      }
+
+      function disconnect() {
+      socket.disconnect();
+      }
+
+      socket.on('connect', function() {
+      document.getElementById('txtStatus').value = 'connected';
+      })
+      socket.on('disconnect', function() {
+      document.getElementById('txtStatus').value = 'disconnected';
+      })
+    </script>
+</head>
+<body>
+<p>my first socket.io test</p>
+<a href="javascript:connect();">Connect</a>
+<a href="javascript:disconnect();">Disconnect</a>
+<form >
+  <input type="text" id ="txtStatus" value="">
+</form>
+</body>
+</html>

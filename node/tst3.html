@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+        <link rel="stylesheet" href="css/styles.css" type="text/css">
+        <title>Twitter</title>
+</head>
+<body>
+        <div id="textbox"></div>
+        <script src="socket-io/socket.io.js"></script>
+        
+        <script>
+        var oldData = [];
+        // Connect to your server and assign the result to a variable
+        var socket = new io.Socket(window.location.hostname, {port: 3128});
+
+        socket.connect();
+        socket.on('connect', function(client){
+                // Do some stuff when connected
+        });
+
+        socket.on('message', function(data){
+                // Do some stuff when you get a message
+                oldData += data;
+                document.getElementById('textbox').innerHTML = oldData;
+        });
+
+        socket.on('disconnect', function(){
+                // Do some stuff when disconnected
+        }); 
+        </script>
+</head>
+</body>
+</html

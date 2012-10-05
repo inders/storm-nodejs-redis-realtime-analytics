@@ -1,0 +1,31 @@
+<html>
+<body>
+<script src="http://cdn.socket.io/stable/socket.io.js"></script>
+
+
+<script>
+// Create SocketIO instance, connect
+var socket = new io.Socket('localhost',{'port': 5454});
+socket.connect(); 
+
+// Add a connect listener
+socket.on('connect',function() {
+  console.log('Client has connected to the server!');
+});
+// Add a connect listener
+socket.on('tags',function(data) {
+  console.log('Received a message from the server!',data);
+  alert(data);
+});
+// Add a disconnect listener
+socket.on('disconnect',function() {
+  console.log('The client has disconnected!');
+});
+
+// Sends a message to the server via sockets
+function sendMessageToServer(message) {
+  socket.send(message);
+}
+</script>
+</body>
+</html>
