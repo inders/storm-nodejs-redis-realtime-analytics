@@ -23,8 +23,8 @@ public class TwitterTopology {
 				
 		//Tweets from twitter sport
 		//TODO: setup your twitter credentials
-		TwitterSampleSpout twitterSpout = new TwitterSampleSpout("indspall",
-        "ibspspmp242001");
+		TwitterSampleSpout twitterSpout = new TwitterSampleSpout("<username>",
+        "<password>");
 		builder.setSpout("twitter", twitterSpout);
 		
 		//Initial filter
