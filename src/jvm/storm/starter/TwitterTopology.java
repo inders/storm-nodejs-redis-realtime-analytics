@@ -8,6 +8,7 @@ import storm.starter.bolt.RedisRetweetBolt;
 import storm.starter.bolt.RedisTagsPublisherBolt;
 import storm.starter.bolt.TwitterFilterBolt;
 import storm.starter.spout.TwitterSampleSpout;
+import storm.starter.spout.FeedSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -23,9 +24,12 @@ public class TwitterTopology {
 				
 		//Tweets from twitter sport
 		//TODO: setup your twitter credentials
-		TwitterSampleSpout twitterSpout = new TwitterSampleSpout("<username>",
-        "<password>");
-		builder.setSpout("twitter", twitterSpout);
+		/*TwitterSampleSpout twitterSpout = new TwitterSampleSpout("radz_24",
+        "Tweets03220");
+		builder.setSpout("twitter", twitterSpout);*/
+		
+		FeedSpout feedSpout = new FeedSpout();
+		builder.setSpout("greader", feedSpout);
 		
 		//Initial filter
 		builder.setBolt("filter", new TwitterFilterBolt(), 2).shuffleGrouping("twitter");
