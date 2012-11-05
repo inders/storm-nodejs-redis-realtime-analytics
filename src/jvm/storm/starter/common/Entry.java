@@ -10,6 +10,7 @@ package storm.starter.common;
 public class Entry {
 
   private String id;
+  private String channel;
   private String title;
   private String content;
   private String publishedAt;
@@ -23,6 +24,14 @@ public class Entry {
   public void setId(String id) {
     this.id = id;
   }
+
+  public String getChannel() {
+	    return channel;
+	  }
+
+	  public void setChannel(String channel) {
+	    this.channel = channel;
+	  }
 
   public String getTitle() {
     return title;

@@ -66,12 +66,13 @@ public class FeedSpout extends SimpleSpout {
     InputStream stdin = processObj.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
 			String xmlString = null;
+			String channel = "GoogleAlerts";
 			String line;
 			String[] feeds;
 			while ((line = reader.readLine()) != null) {
 			      xmlString = xmlString + line;
 			    }
-			feeds = XmlParser.parser(xmlString, chkTime);
+			feeds = XmlParser.parser(xmlString, chkTime, channel );
 			chkTime = feeds[0];
 				for(String feed: feeds) {
 					feedQueue.add(feed);
