@@ -31,7 +31,6 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 	private final List<String> forbiddenDomains = new LinkedList<String>();
 
 	public RedisLinksPublisherBolt() {
-		super(CHANNEL);
 	}
 	
 	@Override
@@ -70,7 +69,7 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 				msg.put("original", url.getURL().toString());
 			}
 			
-			publish(msg.toJSONString());
+			publish(msg.toJSONString(), CHANNEL);
 			
 			if("market.android.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
 				marketUrls.add(msg.toJSONString());
@@ -122,7 +121,6 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 	}
 	
 	public void onConfigurationChange(String conf) {
-		Utils.StringToList(conf, forbiddenDomains);
 	}
 	
 }

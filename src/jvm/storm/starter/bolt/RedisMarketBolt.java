@@ -32,7 +32,6 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 	private final List<String> forbiddenUrls = new LinkedList<String>();
 
 	public RedisMarketBolt() {
-		super(CHANNEL);
 	}
 	
 	@Override
@@ -76,7 +75,7 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 			json.put("description", description);
 			json.put("url", marketURL.toString());
 			
-			publish(json.toJSONString());
+			publish(json.toJSONString(), CHANNEL);
 			
 		} catch (IOException e) {
 			return null;
@@ -115,8 +114,7 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 	}
 
 	@Override
-	public void onConfigurationChange(String conf) {
-		Utils.StringToList(conf, forbiddenUrls);		
+	public void onConfigurationChange(String conf) {	
 	}
 
 }

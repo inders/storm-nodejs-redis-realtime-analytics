@@ -23,7 +23,7 @@ public class RedisRetweetBolt extends RedisBolt {
 	protected int retweetCount;
 	
 	public RedisRetweetBolt(int count) {
-		super(CHANNEL);
+//		super(CHANNEL);
 		retweetCount = count;
 	}
 
@@ -46,7 +46,7 @@ public class RedisRetweetBolt extends RedisBolt {
 		msg.put("id", originalStatus.getId());
 		msg.put("count", status.getRetweetCount() > 100 ? "> 100" : status.getRetweetCount());
 		
-		publish(msg.toJSONString());		
+		publish(msg.toJSONString(), CHANNEL);		
 		
 		List<Object> result = new ArrayList<Object>();
 		result.add(status);
