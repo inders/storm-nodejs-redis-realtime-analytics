@@ -9,7 +9,6 @@ import storm.starter.common.Entry;
 import com.google.gson.Gson;
 
 import storm.starter.bolt.RedisBolt.OnDynamicConfigurationListener;
-import twitter4j.Status;
 
 /**
  * 
@@ -29,7 +28,7 @@ public class ImobiSentimentBolt extends RedisBolt implements OnDynamicConfigurat
   }
 
   @Override
-  public List<Object> filter(Status status) {
+  public List<Object> publishMessage(String string) {
     Gson gson = new Gson();
     String jsonString = (String) currentTuple.getValue(0);
     if (jsonString == null) {

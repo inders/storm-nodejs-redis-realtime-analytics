@@ -41,51 +41,51 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 		setupDynamicConfiguration(this);
 	}
 
-	@Override
-	public List<Object> filter(Status status) {
-		URL marketURL = getMarketUrl();
-		if(marketURL == null) {
-			return null;
-		}
-		
-		synchronized (forbiddenUrls) {
-			if(forbiddenUrls.contains(marketURL.toString())) {
-				log.debug("Forbidden app: " + marketURL.toString());
-				return null;
-			}
-		}
-		
-		
-		try {
-			Document doc = Jsoup.parse(marketURL, 10000);
-			String htmlTitle = doc.title();
-			String icon = doc.select("div.doc-banner-icon").first().select("img").first().attr("src");
-			String ratingValue = doc.select("div.ratings").first().attr("title");
-			Elements ratingElements = doc.select("td.doc-details-ratings-price").first().select("div[title]");
-			String ratingCount = ratingElements.size() >= 2 ? ratingElements.get(1).attr("title") : "";
-			String description = doc.select("div#doc-original-text").first().html();
-			String title = doc.select("h1.doc-banner-title").first().html();
-			
-			JSONObject json = new JSONObject();
-			
-			json.put("title", title);
-			json.put("icon", icon);
-			json.put("ratingValue", ratingValue);
-			json.put("ratingCount", ratingCount);
-			json.put("description", description);
-			json.put("url", marketURL.toString());
-			
-			publish(json.toJSONString(), CHANNEL);
-			
-		} catch (IOException e) {
-			return null;
-		} catch (NullPointerException e) {
-			//If there is any problem parsing the html, just give up.
-			return null;
-		}
-		return null;
-	}
-	
+//	@Override
+//	public List<Object> filter(Status status) {
+//		URL marketURL = getMarketUrl();
+//		if(marketURL == null) {
+//			return null;
+//		}
+//		
+//		synchronized (forbiddenUrls) {
+//			if(forbiddenUrls.contains(marketURL.toString())) {
+//				log.debug("Forbidden app: " + marketURL.toString());
+//				return null;
+//			}
+//		}
+//		
+//		
+//		try {
+//			Document doc = Jsoup.parse(marketURL, 10000);
+//			String htmlTitle = doc.title();
+//			String icon = doc.select("div.doc-banner-icon").first().select("img").first().attr("src");
+//			String ratingValue = doc.select("div.ratings").first().attr("title");
+//			Elements ratingElements = doc.select("td.doc-details-ratings-price").first().select("div[title]");
+//			String ratingCount = ratingElements.size() >= 2 ? ratingElements.get(1).attr("title") : "";
+//			String description = doc.select("div#doc-original-text").first().html();
+//			String title = doc.select("h1.doc-banner-title").first().html();
+//			
+//			JSONObject json = new JSONObject();
+//			
+//			json.put("title", title);
+//			json.put("icon", icon);
+//			json.put("ratingValue", ratingValue);
+//			json.put("ratingCount", ratingCount);
+//			json.put("description", description);
+//			json.put("url", marketURL.toString());
+//			
+//			publish(json.toJSONString(), CHANNEL);
+//			
+//		} catch (IOException e) {
+//			return null;
+//		} catch (NullPointerException e) {
+//			//If there is any problem parsing the html, just give up.
+//			return null;
+//		}
+//		return null;
+//	}
+//	
 	private URL getMarketUrl() {
 		String jsonSource = (String)currentTuple.getValue(0);
 		
@@ -116,5 +116,11 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 	@Override
 	public void onConfigurationChange(String conf) {	
 	}
+
+  @Override
+  public List<Object> publishMessage(String jsonString) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }
