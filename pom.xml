@@ -13,6 +13,17 @@
     <url>https://github.com/arcturus/android-live-storm</url>
   </scm>
   <build>
+<plugins>
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>2.5.1</version>
+		<configuration>
+			<source>1.6</source>
+			<target>1.6</target>
+		</configuration>
+	</plugin> </plugins>
+
     <sourceDirectory>src/jvm</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
@@ -96,6 +107,18 @@
       <artifactId>mongo-java-driver</artifactId>
       <version>2.9.1</version>
     </dependency>
+	<dependency>
+		      <groupId>com.google.code.gson</groupId>
+		      <artifactId>gson</artifactId>
+		      <version>2.2.2</version>
+		      <scope>compile</scope>
+	</dependency>
+
+	<dependency>
+		      <groupId>org.w3c</groupId>
+		      <artifactId>dom</artifactId>
+		      <version>2.3.0-jaxb-1.0.6</version>
+	</dependency>
 <!--    <dependency>
       <groupId>goose</groupId>
       <artifactId>goose</artifactId>
