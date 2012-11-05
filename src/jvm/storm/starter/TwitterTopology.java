@@ -15,8 +15,6 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
 public class TwitterTopology {
-
-<<<<<<< HEAD
   /**
    * @param args
    */
@@ -57,53 +55,4 @@ public class TwitterTopology {
     }
 
   }
-=======
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		TopologyBuilder builder = new TopologyBuilder();
-				
-		//Tweets from twitter sport
-		//TODO: setup your twitter credentials
-		/*TwitterSampleSpout twitterSpout = new TwitterSampleSpout("radz_24",
-        "Tweets03220");
-		builder.setSpout("twitter", twitterSpout);*/
-		
-		FeedSpout feedSpout = new FeedSpout();
-		builder.setSpout("greader", feedSpout);
-		
-		//Initial filter
-		builder.setBolt("filter", new TwitterFilterBolt(), 2).shuffleGrouping("twitter");
-		
-		//Tags publishing
-		builder.setBolt("tags", new RedisTagsPublisherBolt("tags")).shuffleGrouping("filter");
-		
-		//Retweets
-		builder.setBolt("retweets", new RedisRetweetBolt(2),
-        2).shuffleGrouping("filter");
-		
-		//Links
-		builder.setBolt("linkFilter", new LinkFilterBolt(), 2).shuffleGrouping("filter");
-		builder.setBolt("links", new RedisLinksPublisherBolt(), 4).shuffleGrouping("linkFilter");
-		builder.setBolt("market", new RedisMarketBolt(), 1).shuffleGrouping("links");
-		//builder.setBolt("articles", new RedisGooseExtractor(), 5).shuffleGrouping("retweets");
-		
-		
-		Config conf = new Config();
-        conf.setDebug(false);
-        
-        if(args!=null && args.length > 0) {
-            conf.setNumWorkers(3);
-            
-            StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-        } else {
-	        LocalCluster cluster = new LocalCluster();
-          System.out.println("submit topology to local cluster");
-	        cluster.submitTopology("twitter", conf, builder.createTopology());
-        }
-
-	}
->>>>>>> 3445e1f6c30566a1eb3c60193cff0305037219cf
-
 }
