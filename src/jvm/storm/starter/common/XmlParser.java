@@ -17,7 +17,7 @@ import org.xml.sax.InputSource;
 import com.google.gson.Gson;
 
 public class XmlParser {
-  public static String[] parser(String xmlDoc, String timeMarker) throws Exception{
+  public static String[] parser(String xmlDoc, String timeMarker, String channel) throws Exception{
 
 
     DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -36,6 +36,8 @@ public class XmlParser {
 
       UUID uuid = UUID.randomUUID();
       entry.setId(uuid.toString());
+      
+      entry.setChannel(channel);
       
       NodeList title = element.getElementsByTagName("title");
       Element line = (Element) title.item(0);
