@@ -7,8 +7,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import storm.starter.utils.Constants;
-import storm.starter.utils.Constants.Channels;
+import storm.starter.common.Constants;
+import storm.starter.common.Constants.Channels;
+import storm.starter.common.Entry;
 
 import backtype.storm.tuple.Tuple;
 
@@ -39,11 +40,13 @@ public class MongoDBPersistenceBolt extends BasePersistenceBolt {
 
   @Override
   public void persist(Tuple tuple) throws PersistenceException {
+    String eventJson = (String) tuple.getValueByField(Constants.EVENT);
+    Entry channelEvent = Entry.fromJson(eventJson);
     db.requestStart();
     try {
       db.requestEnsureConnection();
-      DBCollection colln = db.getCollection(tuple.getStringByField(Constants.CHANNEL));
-      List<DBObject> docs = getDocuments(tuple);
+      DBCollection colln = db.getCollection(getTableName(channelEvent));
+      List<DBObject> docs = getDocuments(channelEvent);
       colln.insert(docs);
     } finally {
       db.requestDone();
@@ -51,17 +54,14 @@ public class MongoDBPersistenceBolt extends BasePersistenceBolt {
 
   }
 
-  private List<DBObject> getDocuments(Tuple tuple) {
+  private List<DBObject> getDocuments(Entry channelEvent) {
     ArrayList<DBObject> docs = new ArrayList<DBObject>();
     DBObject doc = new BasicDBObject();
-    
-    
-    doc.put(Constants.CHANNEL, tuple.getStringByField(Constants.CHANNEL));
-    doc.put(Constants.GUID, tuple.getStringByField(Constants.GUID));
-    doc.put(Constants.LINK, tuple.getStringByField(Constants.LINK));
-    doc.put(Constants.TITLE, tuple.getStringByField(Constants.TITLE));
-    doc.put(Constants.PUB_DATE, tuple.getStringByField(Constants.PUB_DATE));
-    doc.put(Constants.CREATED_TS, tuple.getStringByField(Constants.CREATED_TS));
+    doc.put(Constants.CHANNEL, channelEvent.getChannel());
+    doc.put(Constants.GUID, channelEvent.getId());
+    doc.put(Constants.LINK, channelEvent.getLink());
+    doc.put(Constants.TITLE, channelEvent.getTitle());
+    doc.put(Constants.PUB_DATE, channelEvent.getPublishedAt());
     docs.add(doc);
     return docs;
   }

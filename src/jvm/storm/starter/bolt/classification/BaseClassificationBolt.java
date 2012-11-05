@@ -2,8 +2,10 @@ package storm.starter.bolt.classification;
 
 import java.util.Map;
 
-import storm.starter.bolt.Entry;
-import storm.starter.utils.Constants;
+import com.google.gson.Gson;
+
+import storm.starter.common.Entry;
+import storm.starter.common.Constants;
 
 
 import backtype.storm.task.OutputCollector;
@@ -27,7 +29,6 @@ public abstract class BaseClassificationBolt implements IRichBolt {
   @Override
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     this.collector = collector;
- 
   }
 
   @Override
@@ -35,14 +36,14 @@ public abstract class BaseClassificationBolt implements IRichBolt {
 
     String eventJson = (String) tuple.getValueByField(Constants.EVENT);
     Gson gson = new Gson();
-    Entry entryd = gson.fromJson(eventJson, Entry.class);
+    Entry channelEvent = gson.fromJson(eventJson, Entry.class);
     
-    SentimentClass classificationResult = classify(entryd.getChannel(), entryd.getContent());
-    entryd.setClass(classificationResult.name());
-    collector.emit(tuple, new Values(gson.toJson(entryd)));
+    SentimentClass classificationResult = classify(channelEvent.getChannel(), channelEvent.getContent());
+    channelEvent.setSentiment(classificationResult);
+    collector.emit(tuple, new Values(gson.toJson(channelEvent)));
 
     // TODO - Think of cases where it should ack/fail
-    if (channel != null && guid != null) {
+    if (channelEvent != null) {
       collector.ack(tuple);
     } else {
       collector.fail(tuple);

@@ -2,9 +2,12 @@ package storm.starter.bolt.persistence;
 
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import storm.starter.bolt.classification.SentimentClass;
-import storm.starter.utils.Constants;
-import storm.starter.utils.Constants.Channels;
+import storm.starter.common.Constants;
+import storm.starter.common.Constants.Channels;
+import storm.starter.common.Entry;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -42,5 +45,8 @@ public abstract class BasePersistenceBolt implements IRichBolt {
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
   }
-
+  
+  public String getTableName(Entry channelEvent) {
+    return channelEvent.getChannel(); 
+  }
 }
