@@ -1,0 +1,6 @@
+1. classifier.sh
+-  Set the path for mallet/bin in mallet variable.
+
+2. run the script
+-  ./classifier.sh "inputstring"
+-  expected output: class probability

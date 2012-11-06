@@ -3,6 +3,10 @@
  */
 package storm.starter.common;
 
+import com.google.gson.Gson;
+
+import storm.starter.bolt.classification.SentimentClass;
+
 /**
  * @author jaydeep.vishwakarma
  * 
@@ -16,6 +20,15 @@ public class Entry {
   private String publishedAt;
   private String link;
   private String author;
+  private SentimentClass sentiment;
+
+  public SentimentClass getSentiment() {
+    return sentiment;
+  }
+
+  public void setSentiment(SentimentClass sentiment) {
+    this.sentiment = sentiment;
+  }
 
   public String getId() {
     return id;
@@ -75,9 +88,13 @@ public class Entry {
 
   @Override
   public String toString() {
-
     return "Entry{id='" + id + "', title='" + title + "', content='" + content + "', publishedat='" + publishedAt + "', link='" + link
         + "', author='" + author + "'}";
+  }
+  
+  public static Entry fromJson(String json) {
+    Gson gson = new Gson();
+    return gson.fromJson(json, Entry.class);
   }
 
 }

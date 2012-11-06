@@ -39,11 +39,6 @@ public abstract class RedisBolt implements IRichBolt {
 	public interface OnDynamicConfigurationListener {
 		public void onConfigurationChange(String conf);
 	}
-	
-	public RedisBolt(String channel) {
-		this.channel = channel;
-		configChannel = "config_update_" + channel;
-	}
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -60,9 +55,9 @@ public abstract class RedisBolt implements IRichBolt {
 		currentTuple = tuple;
 		List<Object> result = null;
 		try {
-			result = filter((Status)tuple.getValue(0));
+			result = publishMessage(tuple.getValue(0).toString());
 		} catch(ClassCastException e) {
-			result = filter(null);
+			result = publishMessage(null);
 		}
 		if(result != null) {
 			for(Object obj: result) {
@@ -89,9 +84,9 @@ public abstract class RedisBolt implements IRichBolt {
 
 	}
 	
-	public abstract List<Object> filter(Status status);
+	public abstract List<Object> publishMessage(String jsonString);
 	
-	public void publish(String msg) {
+	public void publish(String msg, String channel) {
 		Jedis jedis = pool.getResource();
 		jedis.publish(channel, msg);
 		pool.returnResource(jedis);

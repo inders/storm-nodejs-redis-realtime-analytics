@@ -23,34 +23,40 @@ public class RedisRetweetBolt extends RedisBolt {
 	protected int retweetCount;
 	
 	public RedisRetweetBolt(int count) {
-		super(CHANNEL);
+//		super(CHANNEL);
 		retweetCount = count;
 	}
 
-	@Override
-	public List<Object> filter(Status status) {
-		if(status.getRetweetCount() < retweetCount) {
-			return null;
-		}
-		
-		//Just tweets two days old
-		if(status.getCreatedAt().getTime() + 2*24*60*60*1000 < System.currentTimeMillis()) {
-			return null;
-		}
-		
-		JSONObject msg = new JSONObject();
-		Status originalStatus = status.getRetweetedStatus();
-		msg.put("user", originalStatus.getUser().getScreenName());
-		msg.put("photo", originalStatus.getUser().getProfileImageURL().toString());
-		msg.put("tweet", originalStatus.getText());
-		msg.put("id", originalStatus.getId());
-		msg.put("count", status.getRetweetCount() > 100 ? "> 100" : status.getRetweetCount());
-		
-		publish(msg.toJSONString());		
-		
-		List<Object> result = new ArrayList<Object>();
-		result.add(status);
-		return result;
-	}
+//	@Override
+//	public List<Object> filter(Status status) {
+//		if(status.getRetweetCount() < retweetCount) {
+//			return null;
+//		}
+//		
+//		//Just tweets two days old
+//		if(status.getCreatedAt().getTime() + 2*24*60*60*1000 < System.currentTimeMillis()) {
+//			return null;
+//		}
+//		
+//		JSONObject msg = new JSONObject();
+//		Status originalStatus = status.getRetweetedStatus();
+//		msg.put("user", originalStatus.getUser().getScreenName());
+//		msg.put("photo", originalStatus.getUser().getProfileImageURL().toString());
+//		msg.put("tweet", originalStatus.getText());
+//		msg.put("id", originalStatus.getId());
+//		msg.put("count", status.getRetweetCount() > 100 ? "> 100" : status.getRetweetCount());
+//		
+//		publish(msg.toJSONString(), CHANNEL);		
+//		
+//		List<Object> result = new ArrayList<Object>();
+//		result.add(status);
+//		return result;
+//	}
+
+  @Override
+  public List<Object> publishMessage(String jsonString) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

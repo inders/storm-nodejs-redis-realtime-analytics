@@ -31,7 +31,6 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 	private final List<String> forbiddenDomains = new LinkedList<String>();
 
 	public RedisLinksPublisherBolt() {
-		super(CHANNEL);
 	}
 	
 	@Override
@@ -41,47 +40,47 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 		setupDynamicConfiguration(this);
 	}
 
-	@Override
-	public List<Object> filter(Status status) {
-		URLEntity urls[] = status.getURLEntities();
-		
-		if(urls == null) {
-			return null;
-		}
-		
-		URL finalUrl = null;
-		List<Object> marketUrls = new LinkedList<Object>();
-		for(URLEntity url: urls) {
-			finalUrl = getFinalUrl(url.getURL());
-			
-			if(finalUrl == null) {
-				continue;
-			}
-			
-			String extra = null;
-			if(!url.getURL().toString().equals(finalUrl.toString())) {
-				extra = ", \"original\": \"" + url.getURL().toString() + "\"";				
-			}
-			
-			JSONObject msg = new JSONObject();
-			msg.put("link", finalUrl.toString());
-			msg.put("host", finalUrl.getHost());
-			if(extra != null) {
-				msg.put("original", url.getURL().toString());
-			}
-			
-			publish(msg.toJSONString());
-			
-			if("market.android.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
-				marketUrls.add(msg.toJSONString());
-			}
-		}
-		
-		
-		return marketUrls.size() == 0 ? null : marketUrls;
-
-	}
-	
+//	@Override
+//	public List<Object> filter(Status status) {
+//		URLEntity urls[] = status.getURLEntities();
+//		
+//		if(urls == null) {
+//			return null;
+//		}
+//		
+//		URL finalUrl = null;
+//		List<Object> marketUrls = new LinkedList<Object>();
+//		for(URLEntity url: urls) {
+//			finalUrl = getFinalUrl(url.getURL());
+//			
+//			if(finalUrl == null) {
+//				continue;
+//			}
+//			
+//			String extra = null;
+//			if(!url.getURL().toString().equals(finalUrl.toString())) {
+//				extra = ", \"original\": \"" + url.getURL().toString() + "\"";				
+//			}
+//			
+//			JSONObject msg = new JSONObject();
+//			msg.put("link", finalUrl.toString());
+//			msg.put("host", finalUrl.getHost());
+//			if(extra != null) {
+//				msg.put("original", url.getURL().toString());
+//			}
+//			
+//			publish(msg.toJSONString(), CHANNEL);
+//			
+//			if("market.android.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
+//				marketUrls.add(msg.toJSONString());
+//			}
+//		}
+//		
+//		
+//		return marketUrls.size() == 0 ? null : marketUrls;
+//
+//	}
+//	
 	private URL getFinalUrl(URL url, int deep) {
 		if(url == null) {
 			return null;
@@ -122,7 +121,12 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 	}
 	
 	public void onConfigurationChange(String conf) {
-		Utils.StringToList(conf, forbiddenDomains);
 	}
+
+  @Override
+  public List<Object> publishMessage(String jsonString) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 	
 }
