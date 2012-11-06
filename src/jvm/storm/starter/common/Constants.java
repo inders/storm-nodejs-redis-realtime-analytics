@@ -12,6 +12,12 @@ public class Constants {
   public static final String CREATED_TS = "created_on";
   
   public static final String EVENT = "feed";
+  public static final String CLASSIFIER_SCRIPT_PATH = "./classifier/classifier.sh";
+  
+  public enum Classifiers {
+    MAXIMUM_ENTROPY,
+    NAIVE_BAYES
+  }
   
   public enum Channels {
     GOOGLE_ALERTS("googlealerts"), TWITTER("twitter");
