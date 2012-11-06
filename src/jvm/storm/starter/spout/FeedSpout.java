@@ -62,7 +62,7 @@ public class FeedSpout extends SimpleSpout {
     _collector = collector;
     Utils.sleep(3600000); //every one hour
     try{
-    Process processObj = Runtime.getRuntime().exec("sh run.sh"); 
+    Process processObj = Runtime.getRuntime().exec("cd /home/radhika/svnrepo/storm-nodejs-redis-realtime-analytics/oacurl/ sh run.sh"); 
     InputStream stdin = processObj.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
 			String xmlString = null;

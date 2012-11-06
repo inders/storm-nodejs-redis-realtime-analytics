@@ -1,0 +1,12 @@
+*~
+*.orig
+*.rej
+.DS_Store
+
+.classpath
+.project
+.settings
+
+.hg
+
+/target

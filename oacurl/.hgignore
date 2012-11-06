@@ -1,0 +1,14 @@
+syntax: glob
+*~
+*.orig
+*.rej
+.DS_Store
+
+.classpath
+.project
+.settings
+
+.git
+
+syntax: regexp
+^target$

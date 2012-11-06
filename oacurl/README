@@ -1,0 +1,37 @@
+OACurl -- OAuth-enabled HTTP tool
+
+Provided as sample code for using OAuth in Java and for poking at
+OAuth-enabled APIs, especially Google's.
+
+For information, see: http://code.google.com/p/oacurl/
+
+
+BUILDING
+
+$ mvn assembly:assembly
+
+
+SAMPLE USAGE
+
+# Open a web browser to do the OAuth dance and save the credentials
+# locally. The --buzz sets the right scope and service provider URLs.
+$ java -cp target/oacurl-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.google.oacurl.Login --buzz
+
+# GET a URL using the saved credentials from step 1.
+$ java -cp target/oacurl-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.google.oacurl.Fetch \
+    https://www.googleapis.com/buzz/v1/activities/@me/@consumption
+
+
+We recommend that you create "oacurl-login" and "oacurl" aliases or
+shell scripts to avoid dealing with the classpath and main class every
+time.
+
+
+ACKNOWLEDGEMENTS
+
+This code was inspired by and initially derived from the oauth-example-desktop
+sample code by John Kristian, which can be found at:
+
+  http://code.google.com/p/oauth/
+
+

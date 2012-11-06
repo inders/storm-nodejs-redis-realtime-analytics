@@ -29,7 +29,7 @@ public class TwitterTopology {
 		builder.setSpout("twitter", twitterSpout);*/
 		
 		FeedSpout feedSpout = new FeedSpout();
-		builder.setSpout("greader", feedSpout);
+		builder.setSpout("twitter", feedSpout);
 		
 		//Initial filter
 		builder.setBolt("filter", new TwitterFilterBolt(), 2).shuffleGrouping("twitter");
