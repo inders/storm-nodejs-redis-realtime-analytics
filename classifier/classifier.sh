@@ -1,5 +1,5 @@
 #!/bin/bash
-classifierpath=/home/netra/tweet_maxent.classifier
+classifierpath=./classifier/tweet_maxent.classifier
 mallet=$HOME"/mallet-2.0.7/bin/mallet"
 mkdir buzztest
 echo $1 > buzztest/file.txt

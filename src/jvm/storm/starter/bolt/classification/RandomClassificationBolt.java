@@ -19,13 +19,13 @@ public class RandomClassificationBolt extends BaseClassificationBolt {
 
   @Override
   public SentimentClass classify(String channel, String input) {
-    switch (randClassifier.nextInt(2)) {
+    switch (randClassifier.nextInt(1)) {
     case 0:
-      return SentimentClass.POSITIVE;
+      return SentimentClass.pos;
     case 1:
-      return SentimentClass.NEGATIVE;
+      return SentimentClass.neg;
     default:
-      return SentimentClass.NEUTRAL;
+      return SentimentClass.neutral;
     }
   }
 }
