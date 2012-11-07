@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 
 import storm.starter.common.Entry;
 import storm.starter.common.Constants;
-
+import storm.starter.utils.Utils;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -37,8 +37,8 @@ public abstract class BaseClassificationBolt implements IRichBolt {
     String eventJson = (String) tuple.getValueByField(Constants.EVENT);
     Gson gson = new Gson();
     Entry channelEvent = gson.fromJson(eventJson, Entry.class);
-    
-    SentimentClass classificationResult = classify(channelEvent.getChannel(), channelEvent.getContent());
+    String preProcessedContent = preProcessContent(channelEvent.getContent());
+    SentimentClass classificationResult = classify(channelEvent.getChannel(), preProcessedContent);
     channelEvent.setSentiment(classificationResult);
     collector.emit(tuple, new Values(gson.toJson(channelEvent)));
 
@@ -59,6 +59,10 @@ public abstract class BaseClassificationBolt implements IRichBolt {
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declare(new Fields(Constants.EVENT));
+  }
+
+  protected String preProcessContent(String input) {
+    return Utils.html2text(input);
   }
 
 }
