@@ -40,7 +40,6 @@ import storm.starter.common.XmlParser;
 public class FeedSpout extends SimpleSpout {
 
   SpoutOutputCollector _collector;
-  private static final long serialVersionUID = 1L;
   Queue<Object> feedQueue = new LinkedList<Object>();
   String chkTime;
 
@@ -73,7 +72,6 @@ public class FeedSpout extends SimpleSpout {
 			      xmlString = xmlString + line;
 			    }
 			feeds = XmlParser.parser(xmlString, chkTime, channel );
-			chkTime = feeds[0];
 				for(String feed: feeds) {
 					feedQueue.add(feed);
 				}
