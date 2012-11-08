@@ -28,7 +28,7 @@ public class MaxEntClassificationBolt extends BaseClassificationBolt {
 
   private String getClassificationOutput(Classifiers maximumEntropy, String input) {
     String result = "";
-    String cmd = "sh " + Constants.CLASSIFIER_SCRIPT_PATH + " " + input;
+    String cmd = "sh " + Constants.CLASSIFIER_SCRIPT_PATH + " '" + input + "'";
     Process p;
     try {
       System.out.println("cmd : " + cmd);

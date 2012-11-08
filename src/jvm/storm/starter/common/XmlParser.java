@@ -27,20 +27,36 @@ public class XmlParser {
     Document doc = db.parse(inputStream);
     NodeList nodes = doc.getElementsByTagName("entry");
     String time;
+    String newTimeMarker = "";
 
     for (int i = 0; i < nodes.getLength(); i++) {
       Entry entry = new Entry();
       Gson gson = new Gson();
       
       Element element = (Element) nodes.item(i);
+      NodeList title = element.getElementsByTagName("title");
+      Element line = (Element) title.item(0);
+      
+      NodeList published = element.getElementsByTagName("published");
+      line = (Element) published.item(0);
+      time = getCharacterDataFromElement(line);
+      if(i == 0){
+    	  newtimeMarker = time;
+      }
+      if(time == timeMarker)
+      {
+    	  break;
+      }
+      else
+      {
+      entry.setPublishedAt(getCharacterDataFromElement(line));
+      }
 
       UUID uuid = UUID.randomUUID();
       entry.setId(uuid.toString());
       
       entry.setChannel(channel);
       
-      NodeList title = element.getElementsByTagName("title");
-      Element line = (Element) title.item(0);
       
       entry.setTitle(getCharacterDataFromElement(line));
 
@@ -53,17 +69,7 @@ public class XmlParser {
       line = (Element) link.item(0);
       entry.setLink(line.getAttribute("href"));
       
-      NodeList published = element.getElementsByTagName("published");
-      line = (Element) published.item(0);
-      time = getCharacterDataFromElement(line);
-      if(time == timeMarker)
-      {
-    	  break;
-      }
-      else
-      {
-      entry.setPublishedAt(getCharacterDataFromElement(line));
-      }
+      
       
       NodeList authNode = element.getElementsByTagName("author");
       Element authele = (Element) authNode.item(0);
@@ -76,6 +82,8 @@ public class XmlParser {
       
       
     }
+    
+    timeMarker = newTimeMarker;
     String[] jsonString = new String[listJson.size()];
     listJson.toArray( jsonString );
     return jsonString;
