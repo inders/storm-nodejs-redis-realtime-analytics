@@ -19,7 +19,6 @@ import com.google.gson.Gson;
 public class XmlParser {
   public static String[] parser(String xmlDoc, String timeMarker, String channel) throws Exception{
 
-
     DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     InputSource inputStream = new InputSource();
     inputStream.setCharacterStream(new StringReader(xmlDoc));
@@ -28,7 +27,6 @@ public class XmlParser {
     NodeList nodes = doc.getElementsByTagName("entry");
     String time;
     String newTimeMarker = "";
-
     for (int i = 0; i < nodes.getLength(); i++) {
       Entry entry = new Entry();
       Gson gson = new Gson();
@@ -36,29 +34,28 @@ public class XmlParser {
       Element element = (Element) nodes.item(i);
       NodeList title = element.getElementsByTagName("title");
       Element line = (Element) title.item(0);
+      entry.setTitle(getCharacterDataFromElement(line));
       
       NodeList published = element.getElementsByTagName("published");
       line = (Element) published.item(0);
       time = getCharacterDataFromElement(line);
       if(i == 0){
-    	  newtimeMarker = time;
+        newTimeMarker = time;
       }
-      if(time == timeMarker)
-      {
-    	  break;
-      }
-      else
-      {
+//      if(time == timeMarker)
+//      {
+//    	  break;
+//      }
+//      else
+//      {
       entry.setPublishedAt(getCharacterDataFromElement(line));
-      }
+//      }
 
       UUID uuid = UUID.randomUUID();
       entry.setId(uuid.toString());
       
       entry.setChannel(channel);
       
-      
-      entry.setTitle(getCharacterDataFromElement(line));
 
 
       NodeList content = element.getElementsByTagName("content");
@@ -77,11 +74,10 @@ public class XmlParser {
       line = (Element) name.item(0);
       entry.setAuthor(getCharacterDataFromElement(line));
       String entryJson = gson.toJson(entry);
-      //System.out.println(entryJson);
       listJson.add(entryJson);
       
-      
     }
+    
     
     timeMarker = newTimeMarker;
     String[] jsonString = new String[listJson.size()];

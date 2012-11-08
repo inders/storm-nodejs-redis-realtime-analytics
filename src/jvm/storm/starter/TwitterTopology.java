@@ -37,13 +37,13 @@ public class TwitterTopology {
 		builder.setBolt("tags", new RedisTagsPublisherBolt("tags")).shuffleGrouping("filter");
 		
 		//Retweets
-		builder.setBolt("retweets", new RedisRetweetBolt(2),
-        2).shuffleGrouping("filter");
-		
-		//Links
-		builder.setBolt("linkFilter", new LinkFilterBolt(), 2).shuffleGrouping("filter");
-		builder.setBolt("links", new RedisLinksPublisherBolt(), 4).shuffleGrouping("linkFilter");
-		builder.setBolt("market", new RedisMarketBolt(), 1).shuffleGrouping("links");
+//		builder.setBolt("retweets", new RedisRetweetBolt(2),
+//        2).shuffleGrouping("filter");
+//		
+//		//Links
+//		builder.setBolt("linkFilter", new LinkFilterBolt(), 2).shuffleGrouping("filter");
+//		builder.setBolt("links", new RedisLinksPublisherBolt(), 4).shuffleGrouping("linkFilter");
+//		builder.setBolt("market", new RedisMarketBolt(), 1).shuffleGrouping("links");
 		//builder.setBolt("articles", new RedisGooseExtractor(), 5).shuffleGrouping("retweets");
 		
 		

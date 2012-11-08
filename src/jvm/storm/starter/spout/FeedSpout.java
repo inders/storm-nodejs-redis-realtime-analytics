@@ -18,7 +18,6 @@ package storm.starter.spout;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.io.*;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -27,8 +26,9 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import storm.starter.spout.SimpleSpout;
-import storm.starter.common.Entry;
+import storm.starter.common.GoogleReader;
 import storm.starter.common.XmlParser;
+import twitter4j.internal.org.json.JSONException;
 
 /**
  * The feed Spout extends {@link SimpleSpout} and emits Feed URLs to be fetched by {@link FetcherBolt} instances.
@@ -59,20 +59,24 @@ public class FeedSpout extends SimpleSpout {
 	public void open(Map conf, TopologyContext context, SpoutOutputCollector collector){
 		super.open(conf, context, collector);
     _collector = collector;
-    Utils.sleep(3600000); //every one hour
+    System.out.println("called spout--------------------");
+//    Utils.sleep(3600000); //every one hour
     try{
-    Process processObj = Runtime.getRuntime().exec("cd /home/radhika/svnrepo/storm-nodejs-redis-realtime-analytics/oacurl/ sh run.sh"); 
-    InputStream stdin = processObj.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
-			String xmlString = null;
-			String channel = "GoogleAlerts";
-			String line;
-			String[] feeds;
-			while ((line = reader.readLine()) != null) {
-			      xmlString = xmlString + line;
-			    }
-			feeds = XmlParser.parser(xmlString, chkTime, channel );
+     
+//    Process processObj = Runtime.getRuntime().exec("cd /Users/jaydeep.vishwakarma/openproject/storm-nodejs-redis-realtime-analytics/oacurl/ sh run.sh"); 
+//    InputStream stdin = processObj.getInputStream();
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
+//			String xmlString = null;
+//			
+//			String line;
+//			
+//			while ((line = reader.readLine()) != null) {
+//			      xmlString = xmlString + line;
+//			    }
+      String channel = "GoogleAlerts";
+      String[] feeds = XmlParser.parser(GoogleReader.getFeed("inmobibuzz", "inmobi@123"), "", channel );
 				for(String feed: feeds) {
+				  System.out.println(feed);
 					feedQueue.add(feed);
 				}
 			
@@ -82,7 +86,6 @@ public class FeedSpout extends SimpleSpout {
     }
 	}
 	
-
 	@Override
 	public void ack(Object feedId) {
 		feedQueue.add((String) feedId);

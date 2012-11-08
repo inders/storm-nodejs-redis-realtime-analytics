@@ -18,10 +18,14 @@ import twitter4j.Status;
  */
 public class RedisTagsPublisherBolt extends RedisBolt implements OnDynamicConfigurationListener{
 	
-	private final List<String> forbiddenTags = new LinkedList<String>();
-
 	public RedisTagsPublisherBolt(String channel) {
-	}
+    super(channel);
+    // TODO Auto-generated constructor stub
+  }
+
+  private final List<String> forbiddenTags = new LinkedList<String>();
+
+
 	
 	@Override
 	protected void setupNonSerializableAttributes() {

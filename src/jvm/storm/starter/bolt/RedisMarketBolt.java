@@ -28,12 +28,15 @@ import twitter4j.Status;
  */
 public class RedisMarketBolt extends RedisBolt implements OnDynamicConfigurationListener {
 	
-	public static final String CHANNEL = "market";
+	public RedisMarketBolt(String channel) {
+    super(channel);
+    // TODO Auto-generated constructor stub
+  }
+
+  public static final String CHANNEL = "market";
 	private final List<String> forbiddenUrls = new LinkedList<String>();
 
-	public RedisMarketBolt() {
-	}
-	
+
 	@Override
 	protected void setupNonSerializableAttributes() {
 		// TODO Auto-generated method stub

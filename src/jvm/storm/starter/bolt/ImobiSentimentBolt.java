@@ -12,13 +12,16 @@ import storm.starter.bolt.RedisBolt.OnDynamicConfigurationListener;
 
 /**
  * 
- * This bolt will get an url coming from the android market and will try to get the html and parse the information, publishing into a redis
- * channel the information recollected.
  * 
- * @author arcturus@ardeenelinfierno.com
+ * @author jaydeep
  * 
  */
 public class ImobiSentimentBolt extends RedisBolt implements OnDynamicConfigurationListener {
+  public static final String CHANNEL = "market";
+
+  public ImobiSentimentBolt() {
+    super(CHANNEL);
+  }
 
   @Override
   protected void setupNonSerializableAttributes() {
@@ -37,7 +40,8 @@ public class ImobiSentimentBolt extends RedisBolt implements OnDynamicConfigurat
 
     try {
       Entry entry = gson.fromJson(jsonString, Entry.class);
-      publish(jsonString, entry.getChannel());
+      System.out.println("Title : " + entry.getTitle() + " Publihsed At : " + entry.getPublishedAt());
+      publish(entry.getChannel(), jsonString);
     } catch (Exception e) {
       return null;
     }

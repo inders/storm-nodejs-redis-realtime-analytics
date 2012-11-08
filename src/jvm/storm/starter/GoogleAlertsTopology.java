@@ -1,17 +1,9 @@
 package storm.starter;
 
-import storm.starter.bolt.LinkFilterBolt;
-//import storm.starter.bolt.RedisGooseExtractor;
 import storm.starter.bolt.ImobiSentimentBolt;
-import storm.starter.bolt.RedisLinksPublisherBolt;
-import storm.starter.bolt.RedisMarketBolt;
-import storm.starter.bolt.RedisRetweetBolt;
-import storm.starter.bolt.RedisTagsPublisherBolt;
-import storm.starter.bolt.TwitterFilterBolt;
 import storm.starter.bolt.classification.RandomClassificationBolt;
-import storm.starter.bolt.persistence.MongoDBPersistenceBolt;
+
 import storm.starter.spout.FeedSpout;
-import storm.starter.spout.TwitterSampleSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -32,7 +24,7 @@ public class GoogleAlertsTopology {
 
     builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
     builder.setBolt("publish", new ImobiSentimentBolt(), 5).shuffleGrouping("randomclassifier");
-    builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
+//    builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
 
     Config conf = new Config();
     conf.setDebug(false);

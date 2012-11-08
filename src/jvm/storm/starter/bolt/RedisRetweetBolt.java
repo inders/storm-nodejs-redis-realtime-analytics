@@ -19,13 +19,17 @@ import twitter4j.Status;
  */
 public class RedisRetweetBolt extends RedisBolt {
 	
-	public static final String CHANNEL = "retweets";
+	public RedisRetweetBolt(String channel) {
+    super(channel);
+    // TODO Auto-generated constructor stub
+  }
+
+
+
+  public static final String CHANNEL = "retweets";
 	protected int retweetCount;
 	
-	public RedisRetweetBolt(int count) {
-//		super(CHANNEL);
-		retweetCount = count;
-	}
+
 
 //	@Override
 //	public List<Object> filter(Status status) {

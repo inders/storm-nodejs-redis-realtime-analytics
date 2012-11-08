@@ -27,12 +27,15 @@ import twitter4j.URLEntity;
  */
 public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfigurationListener{
 	
-	public static final String CHANNEL = "links";
+	public RedisLinksPublisherBolt(String channel) {
+    super(channel);
+    // TODO Auto-generated constructor stub
+  }
+
+  public static final String CHANNEL = "links";
 	private final List<String> forbiddenDomains = new LinkedList<String>();
 
-	public RedisLinksPublisherBolt() {
-	}
-	
+
 	@Override
 	protected void setupNonSerializableAttributes() {
 		// TODO Auto-generated method stub
