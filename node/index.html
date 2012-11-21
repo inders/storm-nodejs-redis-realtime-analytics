@@ -28,6 +28,10 @@ div.graph
 
 <script src="/socket.io/socket.io.js"></script>
     <script>
+    // Constants
+    var POS = 'pos';
+    var NEG = 'neg';
+    var NEUT = 'neutral'
     // global var to store pie-chart data
     channelCounts = new Array();
     // Tick store
@@ -137,7 +141,10 @@ div.graph
         
         if (!counts) {
           counts = new Object();
-          counts[label] = 1;
+          counts[POS] = 0;
+          counts[NEG] = 0;
+          counts[NEUT] = 0;
+
           channelCounts[channel] = counts;
         }
 
