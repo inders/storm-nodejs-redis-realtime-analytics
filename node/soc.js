@@ -6,11 +6,11 @@ var app = require('http').createServer(handler)
 app.listen(5431);
 
 var sub = redis.createClient();
-sub.subscribe('tags');
+sub.subscribe('GoogleAlerts');
 
 
 sub.on('message', function(channel, message){
-	//	console.log(" recvfrom channel : %s, the message : %s", channel, message);
+		console.log(" recvfrom channel : %s, the message : %s", channel, message);
     });
 
 function handler (req, res) {
