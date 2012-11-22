@@ -1,6 +1,7 @@
 package storm.starter;
 
 import storm.starter.bolt.ImobiSentimentBolt;
+import storm.starter.bolt.classification.MaxEntClassificationBolt;
 import storm.starter.bolt.classification.RandomClassificationBolt;
 
 import storm.starter.spout.FeedSpout;
@@ -22,7 +23,8 @@ public class GoogleAlertsTopology {
 
     // Initial filter
 
-    builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
+    //builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
+    builder.setBolt("classifier", new MaxEntClassificationBolt(), 5).shuffleGrouping("googlealerts");
     builder.setBolt("publish", new ImobiSentimentBolt(), 5).shuffleGrouping("randomclassifier");
 //    builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
 
