@@ -25,7 +25,7 @@ public class GoogleAlertsTopology {
 
     //builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
     builder.setBolt("classifier", new MaxEntClassificationBolt(), 5).shuffleGrouping("googlealerts");
-    builder.setBolt("publish", new ImobiSentimentBolt(), 5).shuffleGrouping("randomclassifier");
+    builder.setBolt("publish", new ImobiSentimentBolt(), 5).shuffleGrouping("classifier");
 //    builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
 
     Config conf = new Config();
