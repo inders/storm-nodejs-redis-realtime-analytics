@@ -1,5 +1,5 @@
 #!/bin/bash
-classifierpath=./classifier/maxentbigrams.classifier
+classifierpath=./classifier/naivebayes.classifier
 mallet=$HOME"/mallet-2.0.7/bin/mallet"
 mkdir buzztest
 echo $1 > buzztest/file.txt

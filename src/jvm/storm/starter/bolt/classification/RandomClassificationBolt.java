@@ -15,11 +15,11 @@ import backtype.storm.tuple.Values;
  */
 public class RandomClassificationBolt extends BaseClassificationBolt {
 
-  private static Random randClassifier = new Random();
+  private static Random randClassifier = new Random(System.currentTimeMillis());
 
   @Override
   public SentimentClass classify(String channel, String input) {
-    switch (randClassifier.nextInt(1)) {
+    switch (randClassifier.nextInt(2)) {
     case 0:
       return SentimentClass.pos;
     case 1:
@@ -27,5 +27,11 @@ public class RandomClassificationBolt extends BaseClassificationBolt {
     default:
       return SentimentClass.neutral;
     }
+  }
+  
+  public static void main(String[] args) {
+    System.out.println(new RandomClassificationBolt().classify("ga", "123").toString());
+    System.out.println(new RandomClassificationBolt().classify("ga", "123").toString());
+    System.out.println(new RandomClassificationBolt().classify("ga", "123").toString());
   }
 }
