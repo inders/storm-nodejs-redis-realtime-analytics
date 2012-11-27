@@ -6,8 +6,7 @@ var app = require('http').createServer(handler)
 app.listen(5431);
 
 var sub = redis.createClient();
-sub.subscribe('GoogleAlerts.pos');
-sub.subscribe('GoogleAlerts.neg');
+sub.subscribe('GoogleAlerts');
 
 
 sub.on('message', function(channel, message){

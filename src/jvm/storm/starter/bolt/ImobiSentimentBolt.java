@@ -41,7 +41,7 @@ public class ImobiSentimentBolt extends RedisBolt implements OnDynamicConfigurat
     try {
       Entry entry = gson.fromJson(jsonString, Entry.class);
       System.out.println("Title : " + entry.getTitle() + " Publihsed At : " + entry.getPublishedAt());
-      publish(entry.getChannel() + "." + entry.getSentiment() , jsonString);
+      publish(entry.getChannel(), jsonString);
     } catch (Exception e) {
       return null;
     }
