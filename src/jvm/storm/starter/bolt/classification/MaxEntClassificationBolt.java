@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.lang.StringUtils;
+
 import storm.starter.common.Constants;
 import storm.starter.common.Constants.Classifiers;
 
@@ -23,11 +25,15 @@ public class MaxEntClassificationBolt extends BaseClassificationBolt {
   @Override
   public SentimentClass classify(String channel, String input) {
     String classficationResult = getClassificationOutput(Constants.Classifiers.MAXIMUM_ENTROPY, input);
-    return SentimentClass.valueOf(classficationResult);
+    if (classficationResult != null) {
+      return SentimentClass.valueOf(classficationResult);
+    }
+    return SentimentClass.neutral;
   }
 
   private String getClassificationOutput(Classifiers maximumEntropy, String input) {
     String result = "";
+    input = StringUtils.strip(input, "'");
     String cmd = "sh " + Constants.CLASSIFIER_SCRIPT_PATH + " '" + input + "'";
     Process p;
     try {
@@ -36,17 +42,17 @@ public class MaxEntClassificationBolt extends BaseClassificationBolt {
       p = rt.exec(cmd);
       p.waitFor();
 
-      BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-      if (errorReader.readLine() != null) {
-        System.out.println("ERROR : " + errorReader.readLine());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      result = reader.readLine();
+      System.out.println("Class : " + result);
+      if (result != null) {
+        String[] resultArr = result.split(" ");
+        System.out.println("Score : " + resultArr[1]);
+        return resultArr[0];
       } else {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        result = reader.readLine();
-        System.out.println("Class : " + result);
-        if (result != null) {
-          String[] resultArr = result.split(" ");
-          System.out.println("Score : " + resultArr[1]);
-          return resultArr[0];
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        if (errorReader.readLine() != null) {
+          System.out.println("ERROR : " + errorReader.readLine());
         }
       }
     } catch (IOException e) {

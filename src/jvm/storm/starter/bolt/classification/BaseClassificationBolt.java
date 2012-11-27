@@ -43,11 +43,11 @@ public abstract class BaseClassificationBolt implements IRichBolt {
     collector.emit(tuple, new Values(gson.toJson(channelEvent)));
 
     // TODO - Think of cases where it should ack/fail
-    if (channelEvent != null) {
+//    if (channelEvent != null) {
       collector.ack(tuple);
-    } else {
-      collector.fail(tuple);
-    }
+//    } else {
+//      collector.fail(tuple);
+//    }
   }
 
   public abstract SentimentClass classify(String channel, String input);
