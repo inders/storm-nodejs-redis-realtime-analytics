@@ -1,7 +1,11 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  var socket = io.connect('http://localhost');
-  socket.on('GoogleAlerts', function (data) {
-   console.log(data);
-  });
+	var socketneg = io.connect('http://localhost');
+	socketneg.on('GoogleAlerts.neg', function(data) {
+		console.log(data);
+	});
+	var socketpos = io.connect('http://localhost');
+	socketpos.on('GoogleAlerts.pos', function(data) {
+		console.log(data);
+	});
 </script>
