@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 
@@ -82,6 +83,8 @@ public class FileFeedSpout extends SimpleSpout {
         String[] sCurrentLineArray = sCurrentLine.split("\u0001");
         Entry entry = new Entry();
         Gson gson = new Gson();
+        UUID uuid = UUID.randomUUID();
+        entry.setId(uuid.toString());
         entry.setTitle(sCurrentLineArray[0]);
         entry.setPublishedAt(sCurrentLineArray[1]);
         entry.setContent(sCurrentLineArray[2]);
