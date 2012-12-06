@@ -5,6 +5,7 @@
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.pie.js"></script>
 
+
 <style type="text/css">
 div.graph
 		{
@@ -32,42 +33,25 @@ div.graph
     var POS = 'pos';
     var NEG = 'neg';
     var NEUT = 'neutral'
-    // global var to store pie-chart data
-    channelCounts = new Array();
-    // Tick store
-    var tickStore = window.localStorage;
-    tickStore.clear();
+    var socket = io.connect('http://localhost:8080/');
 
-    var getChannelTicks = function (channel, label) {
-        console.log(' GETTTING TICKS FOR ' + channel + label);
-        var ticks = new Array();
-        var ids = JSON.parse(tickStore[channel + label + '_ids']);
-
-        for ( i in ids ) {
-            var tid = ids[i];
-            console.log('Getting tick: ' + tid);
-            tickstr = tickStore[channel + '_' + tid];
-            console.log('GOT TICK' + tickstr);
-
-            ticks.push(tickstr);
-        }
-        return ticks;
-    };
-
-    var displayTicks = function (channel, label) {
-        var ticks = getChannelTicks(channel, label);
-
+    socket.on('search_results', function (results) {
+        var channel = results.channel;
+        var label = results.label;
+        
         $('#tickList').empty();
 
-        $('#tickList').append('<div class="chartTitle">Ticks for ' + channel + ':' + label + '</div>');
+        $('#tickList').append('<div class="chartTitle">Ticks for ' + channel + ' : ' + label + '</div>');
         $('#tickList').append('<ol id="tickLi"></ol>');
-        for (t in ticks) {
-            var tickstr = ticks[t];
-            var tick = JSON.parse(tickstr);
-            console.log(t.link);
-            $('#tickLi').append('<li><a href="' + tick.link + '">' + tick.title + '</a></li>');
+        
+        var result = JSON.parse(results.result_body);
+        console.log('Got search results :' + result.hits.total);
+        for (var i = 0; i < result.hits.total; i++) {
+            var hit = result.hits.hits[i];
+            var m = hit['_source'];
+            $('#tickLi').append('<li><a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
         }
-    };
+    });
 
     
     var plotClickCb = function (event, pos, obj) {
@@ -79,14 +63,18 @@ div.graph
         var channel = selDiv.getAttribute('id').replace("channel_", "");
 
         var lbl = obj.series.label;
-        displayTicks(channel, lbl);
+        socket.emit('search', {
+            'channel': channel,
+            'sentiment' : lbl
+        });
     };
 
 
     var plotHoverCb = function (event, pos, obj) {
     };
 
-    var drawChart = function (channel) {
+    var drawChart = function (counts) {
+        var channel = counts.channel;
         // Set chart in the div for this channel
         var channelDiv = $('#channel_' + channel);
 
@@ -100,11 +88,10 @@ div.graph
         channelDiv.empty();
 
         // Data for this plot
-        var counts = channelCounts[channel];
-        console.log('COUNTS SO FAR: '  + JSON.stringify(counts));
         var plotData = new Array();
-        for (key in counts) {
-            plotData.push( { label: key , data: counts[key]});
+        var sentiments = [POS, NEG, NEUT];
+        for (i in sentiments) {
+            plotData.push( { label: sentiments[i] , data: counts[sentiments[i]]});
         }
 
         $.plot(channelDiv, plotData, 
@@ -129,52 +116,16 @@ div.graph
         channelDiv.bind('plotclick', plotClickCb);
     };
 
-    var socket = io.connect('http://localhost:8080/');
-
-    socket.on('tick', function (tick) {
-        console.log('Got new tick' + JSON.stringify(tick));
-        var channel = tick.channel;
-        var label = tick.label;
-
-        var counts = channelCounts[channel];
-        // Update counts
-        
-        if (!counts) {
-          counts = new Object();
-          counts[POS] = 0;
-          counts[NEG] = 0;
-          counts[NEUT] = 0;
-
-          channelCounts[channel] = counts;
-        }
-
-        var precount = counts[label];
-        if (precount) {
-            counts[label] = precount + 1;
-        } else {
-            counts[label] = 1;
-        }
-
-
-        // Store the tick in local storage
-        tickStore[channel + "_" + tick.id] = JSON.stringify({
-            id: tick.id, 
-            title: tick.title,
-            link: tick.link
-        });
-
-        var channelIds = tickStore.getItem(channel + label + '_ids');
-        if (!channelIds) {
-            channelIds = '[]';
-        }
-        // Store IDs for easy retrieval later during displaying ticks of a channel
-        var ids = JSON.parse(channelIds);
-        ids.push(tick.id);
-        tickStore[channel + label +  '_ids'] = JSON.stringify(ids);
+    socket.on('counts', function (counts) {
+        console.log('Got counts: ' + JSON.stringify(counts));
         // Refresh chart
-        drawChart(channel);
+        drawChart(counts);
     });
-
+    
+    socket.on('tick', function (tick) {
+        console.log('Got new message:'  +JSON.stringify(tick));
+    });
+    
     console.log("APP SETUP");
     </script>
 </body>

@@ -11,11 +11,7 @@ var express = require('express')
 server.listen(8080);
 
 // Globals
-var channelCounts = new Array();
-
-/* Convert a message sent by redis to the format expected by browser */
-// TODO : Remove random code with actual redis code
-var idCount = 0;
+var ChannelCounts = new Object();
 
 var POS = "pos";
 var NEG = "neg";
@@ -24,21 +20,9 @@ var NEUT = "neutral";
 var labels = [POS, NEG, NEUT];
 var channels = ["GoogleAlerts"];
 
-var ES_URI = 'http://localhost:9200/ticks/'
-
-var makeTick = function(inmsgStr) {
-    var inmsg = JSON.parse(inmsgStr);
-    console.log('>>>> sentiment ' + inmsg.sentiment);
-
-    var outmsg =  {
-        channel: inmsg.channel,
-        label: inmsg.sentiment,
-        id: inmsg.id,
-        title: inmsg.title,
-        link: inmsg.link
-    };
-    return outmsg;
-};
+var ES_HOST = 'localhost';
+var ES_PORT = 9200;
+var ES_INDEX = 'ticks';
 
 /** Socket.io **/
 io.sockets.on('connection', function(socket) {
@@ -47,16 +31,46 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function() {
         console.log(' >>>>>>>> User disconnected');
     });
+    
+    socket.on('search', function(data) {
+        console.log('NEW SEARCH REQUEST ' + JSON.stringify(data));
+        var options = {
+          hostname: ES_HOST,
+          port: ES_PORT,
+          path: ES_INDEX + '/_search?q=sentiment:' + data.sentiment + '&size=1000',
+          method: 'GET'
+        };
+        
+        console.log('Sending search req to ' + options.path);
+        
+        var req = http.request(options, function(res) {
+            // Send the query result back to the client
+            var chunks = new Array();
+            res.on('data', function(chunk) {
+                chunks.push(chunk);
+            });
+            
+            res.on('end', function () {
+                // Send the response to browser
+                socket.emit('search_results', {
+                    'channel': data.channel,
+                    'label': data.label,
+                    'result_body': chunks.join("")
+                });
+            });
+        });
+        req.end();
+        console.log('search request sent to ES:' + data.channel + ', ' + data.label);
+    });
 });
 
 /** Web endpoints and Express setup **/
-
+app.use(express.logger());
 app.use("/static", express.static(__dirname + '/static'));
 
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
 });
-
 
 /** Redis **/
 var redisClient = redis.createClient();
@@ -64,52 +78,53 @@ for (var i = 0; i < channels.length; i++) {
     redisClient.subscribe(channels[i]);
 }
 
-/*
-var cl2 = redis.createClient();
-var negid = 1;
-redisClient.on('subscribe', function(channel, count) {
-    console.log('SUBSCRIBED ' + channel);
-    if ('GoogleAlerts' === channel) { 
-        console.log('>>> Setting timer')
-        setInterval(function () {
-            negid += 1;
-            cl2.publish('GoogleAlerts', JSON.stringify({
-                channel: 'GoogleAlerts',
-                sentiment: NEG ,
-                id: '' + negid,
-                title: 'Glasdoor Employee Review',
-                link: 'http://www.glassdoor.com/Reviews/Employee-Review-InMobi-RVW2045626.htm'
-            }));
-            console.log('###### Sent negative tick');
-        }, 5000);
-    }
-});
-*/
-
 var saveInES = function(message) {
+    message = JSON.parse(message);
     var options = {
-      hostname: 'localhost',
-      port: 9200,
-      path: '/ticks/' + message.channel + '/' + message.id,
+      hostname: ES_HOST,
+      port: ES_PORT,
+      path: ES_INDEX + '/' + message.channel + '/' + message.id,
       method: 'PUT'
     };
 
     var req = http.request(options, function(res) {
-        console.log('STATUS: ' + res.statusCode);
-        console.log('HEADERS: ' + JSON.stringify(res.headers));
     });
 
     req.write(JSON.stringify(message) + '\n');
     req.end();
-    console.log('$#$#$#$#$#$#$#$#$ SAVED IN ES');
+    console.log('written to ES:' + message.id);
 };
-    
+
+var updateCounts = function(inmsgStr) {
+    var inmsg = JSON.parse(inmsgStr);
+    var channel = inmsg.channel;
+    var label = inmsg.sentiment;
+
+    // Update counts for the channel
+    var counts = ChannelCounts[channel];        
+    if (!counts) {
+      counts = new Object();
+      counts['channel'] = channel;
+      counts[POS] = 0;
+      counts[NEG] = 0;
+      counts[NEUT] = 0;
+      ChannelCounts[channel] = counts;
+    }
+    var precount = counts[label];
+    if (precount) {
+        counts[label] = precount + 1;
+    } else {
+        counts[label] = 1;
+    }
+    console.log('Sending count:' + JSON.stringify(ChannelCounts[channel]));
+    io.sockets.emit('counts', ChannelCounts[channel]);
+    //io.sockets.emit('tick', tick);
+    return {'channel': channel, 'link': inmsg.link, 'sentiment': sentiment, 'title': inmsg.title};
+};
+  
 redisClient.on('message', function (channel, message) {
-    // Broadcast message to all clients
-    var tick = makeTick(message);
-    saveInES(tick);
-    io.sockets.emit('tick', tick);
+    console.log('New event on ' + channel); 
+    saveInES(message);
+    updateCounts(message);
+    console.log('Sent message and counts to clients');
 });
-
-
-
