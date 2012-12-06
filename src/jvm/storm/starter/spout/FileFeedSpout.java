@@ -87,6 +87,7 @@ public class FileFeedSpout extends SimpleSpout {
         entry.setContent(sCurrentLineArray[2]);
         entry.setLink(sCurrentLineArray[3]);
         entry.setAuthor(sCurrentLineArray[4]);
+        entry.setChannel(channel);
         String entryJson = gson.toJson(entry);
         listJson.add(entryJson);
         System.out.println(entryJson);
