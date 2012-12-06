@@ -27,7 +27,13 @@ var ES_INDEX = 'ticks';
 /** Socket.io **/
 io.sockets.on('connection', function(socket) {
     console.log(' <<<<<< User connected');
-
+    // Send latest counts
+    for (var i = 0; i < channels.length; i++) {
+        var channel = channels[i];
+        if (ChannelCounts[channel]) {
+            socket.emit('counts', ChannelCounts[channel]);
+        }
+    }
     socket.on('disconnect', function() {
         console.log(' >>>>>>>> User disconnected');
     });
@@ -54,7 +60,7 @@ io.sockets.on('connection', function(socket) {
                 // Send the response to browser
                 socket.emit('search_results', {
                     'channel': data.channel,
-                    'label': data.label,
+                    'label': data.sentiment,
                     'result_body': chunks.join("")
                 });
             });
@@ -118,7 +124,7 @@ var updateCounts = function(inmsgStr) {
     }
     console.log('Sending count:' + JSON.stringify(ChannelCounts[channel]));
     io.sockets.emit('counts', ChannelCounts[channel]);
-    //io.sockets.emit('tick', tick);
+    io.sockets.emit('tick', inmsg);
     return {'channel': channel, 'link': inmsg.link, 'sentiment': sentiment, 'title': inmsg.title};
 };
   

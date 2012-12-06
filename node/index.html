@@ -1,7 +1,8 @@
 <html>
 <head><title>InMobi Buzz</title></head>
-
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.24/themes/base/jquery-ui.css">
 <script language="javascript" type="text/javascript" src="/static/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="/static/jquery-ui-1.8.24.custom.min.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.pie.js"></script>
 
@@ -22,8 +23,9 @@ div.graph
 <div id='channelContainer'>
 </div>
 <br>
-<div id="tickDisplayArea">
-<div id="tickList">
+<div id="latestMessage" class="flash"></div>
+<div id="tickDisplayArea"></div>
+<div id="tickList"></div>
 </div>
 </div>
 
@@ -34,6 +36,8 @@ div.graph
     var NEG = 'neg';
     var NEUT = 'neutral'
     var socket = io.connect('http://localhost:8080/');
+    var FlashNewMessage = true;
+    var FlashSearchResults = true;
 
     socket.on('search_results', function (results) {
         var channel = results.channel;
@@ -51,6 +55,10 @@ div.graph
             var m = hit['_source'];
             $('#tickLi').append('<li><a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
         }
+        if (FlashSearchResults) {
+            $('#tickList').effect('highlight', {}, 2000);
+            FlashSearchResults = false;
+        }   
     });
 
     
@@ -121,9 +129,24 @@ div.graph
         // Refresh chart
         drawChart(counts);
     });
+        
+    
+    
+    setInterval(function () {
+        FlashNewMessage = true;
+        FlashSearchResults = true;
+    }, 5000);
     
     socket.on('tick', function (tick) {
+     if (FlashNewMessage) {
         console.log('Got new message:'  +JSON.stringify(tick));
+        $('#latestMessage').html('<span class="' + tick.channel + '" >' + tick.channel +': </span>'
+            + '<span class="link"><a href="' + tick.link + '" target="_blank">' + tick.title +' '+ '</a></span>'
+            + '<span class="pubDate"> [' + tick.publishedAt +'] '+  '</span>'
+            );
+        $('#latestMessage').effect('highlight', {}, 3000);
+        FlashNewMessage = false;  
+     }
     });
     
     console.log("APP SETUP");
