@@ -6,6 +6,7 @@ import storm.starter.bolt.classification.RandomClassificationBolt;
 import storm.starter.bolt.persistence.MongoDBPersistenceBolt;
 
 import storm.starter.spout.FeedSpout;
+import storm.starter.spout.FileFeedSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -19,9 +20,12 @@ public class GoogleAlertsTopology {
   public static void main(String[] args) throws Exception {
     
     TopologyBuilder builder = new TopologyBuilder();
-    FeedSpout feedSpout = new FeedSpout();
-    builder.setSpout("googlealerts", feedSpout);
-
+//    FeedSpout feedSpout = new FeedSpout();
+//    builder.setSpout("googlealerts", feedSpout);
+    
+    
+  FeedSpout feedSpout = new FeedSpout();
+  builder.setSpout("googlealerts", feedSpout);
     // Initial filter
 
     //builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
