@@ -85,18 +85,18 @@ for (var i = 0; i < channels.length; i++) {
 }
 
 var saveInES = function(message) {
-    message = JSON.parse(message);
+    var msg = JSON.parse(message);
     var options = {
       hostname: ES_HOST,
       port: ES_PORT,
-      path: ES_INDEX + '/' + message.channel + '/' + message.id,
+      path: ES_INDEX + '/' + msg.channel + '/' + msg.id,
       method: 'PUT'
     };
 
     var req = http.request(options, function(res) {
     });
 
-    req.write(JSON.stringify(message) + '\n');
+    req.write(message + '\n');
     req.end();
     console.log('written to ES:' + message.id);
 };
@@ -105,6 +105,7 @@ var updateCounts = function(inmsgStr) {
     var inmsg = JSON.parse(inmsgStr);
     var channel = inmsg.channel;
     var label = inmsg.sentiment;
+    console.log('%%%%%%%%%%%%%%%%%%%% ' + inmsg.title + ' ' + label);
 
     // Update counts for the channel
     var counts = ChannelCounts[channel];        
@@ -125,11 +126,11 @@ var updateCounts = function(inmsgStr) {
     console.log('Sending count:' + JSON.stringify(ChannelCounts[channel]));
     io.sockets.emit('counts', ChannelCounts[channel]);
     io.sockets.emit('tick', inmsg);
-    return {'channel': channel, 'link': inmsg.link, 'sentiment': sentiment, 'title': inmsg.title};
 };
   
 redisClient.on('message', function (channel, message) {
     console.log('New event on ' + channel); 
+    console.log('####### MESSAGE ' +  message);
     saveInES(message);
     updateCounts(message);
     console.log('Sent message and counts to clients');
