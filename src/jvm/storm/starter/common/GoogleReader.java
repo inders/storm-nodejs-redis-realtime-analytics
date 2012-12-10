@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.jsoup.Jsoup;
@@ -27,6 +28,8 @@ public class GoogleReader {
   private static final String _TOKEN_URL = _API_URL + "token";
   private static final String _USER_INFO_URL = _API_URL + "user-info";
   private static final String _SUBSCRIPTION_LIST_URL = _API_URL + "subscription/list";
+  
+  private static Date currentpublishedAt;
 
   public static String getGoogleAuthKey(String _USERNAME, String _PASSWORD) throws UnsupportedEncodingException, IOException {
     Document doc = Jsoup.connect(_GOOGLE_LOGIN_URL)
@@ -93,4 +96,11 @@ public class GoogleReader {
     return xmlString;
   }
 
+  public synchronized static void setTimeMarker(Date pubAt) {
+    currentpublishedAt = pubAt;
+  }
+  
+  public static Date getLatestTimeMarker() {
+    return currentpublishedAt;
+  }
 }
