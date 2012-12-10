@@ -18,21 +18,22 @@ public class GoogleAlertsTopology {
    * @param args
    */
   public static void main(String[] args) throws Exception {
-    
+
     TopologyBuilder builder = new TopologyBuilder();
-//    FeedSpout feedSpout = new FeedSpout();
-//    builder.setSpout("googlealerts", feedSpout);
-    
-    
-  FeedSpout feedSpout = new FeedSpout();
-  builder.setSpout("googlealerts", feedSpout);
+    FileFeedSpout fileSpout = new FileFeedSpout();
+    builder.setSpout("filespout", fileSpout);
+
+    FeedSpout feedSpout = new FeedSpout();
+    builder.setSpout("googlealerts", feedSpout);
     // Initial filter
 
-    //builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
-    builder.setBolt("classifier", new MaxEntClassificationBolt(), 1).shuffleGrouping("googlealerts");
-    builder.setBolt("publish", new ImobiSentimentBolt(), 1).shuffleGrouping("classifier");
-//    builder.setBolt("store", new MongoDBPersistenceBolt(), 1).shuffleGrouping("classifier");
-//    builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
+    // builder.setBolt("randomclassifier", new RandomClassificationBolt(), 5).shuffleGrouping("googlealerts");
+    builder.setBolt("classifier1", new MaxEntClassificationBolt(), 1).shuffleGrouping("googlealerts");
+    builder.setBolt("classifier2", new MaxEntClassificationBolt(), 1).shuffleGrouping("filespout");
+    builder.setBolt("publish1", new ImobiSentimentBolt(), 1).shuffleGrouping("classifier1");
+    builder.setBolt("publish2", new ImobiSentimentBolt(), 1).shuffleGrouping("classifier2");
+    // builder.setBolt("store", new MongoDBPersistenceBolt(), 1).shuffleGrouping("classifier");
+    // builder.setBolt("persistence", new MongoDBPersistenceBolt(), 5).shuffleGrouping("randomclassifier");
 
     Config conf = new Config();
     conf.setDebug(false);
