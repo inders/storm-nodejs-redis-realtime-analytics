@@ -1,6 +1,9 @@
 package storm.starter.common;
 
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import java.util.ArrayList;
 
@@ -17,7 +20,7 @@ import org.xml.sax.InputSource;
 import com.google.gson.Gson;
 
 public class XmlParser {
-  public static String[] parser(String xmlDoc, String timeMarker, String channel) throws Exception{
+  public static String[] parser(String xmlDoc, String timeMarker, String channel) throws Exception {
 
     DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     InputSource inputStream = new InputSource();
@@ -30,44 +33,38 @@ public class XmlParser {
     for (int i = 0; i < nodes.getLength(); i++) {
       Entry entry = new Entry();
       Gson gson = new Gson();
-      
+
       Element element = (Element) nodes.item(i);
-      NodeList title = element.getElementsByTagName("title");
-      Element line = (Element) title.item(0);
-      entry.setTitle(getCharacterDataFromElement(line));
-      
+
       NodeList published = element.getElementsByTagName("published");
-      line = (Element) published.item(0);
+      Element line = (Element) published.item(0);
       time = getCharacterDataFromElement(line);
-      if(i == 0){
-        newTimeMarker = time;
+
+      final Calendar pubDate = javax.xml.bind.DatatypeConverter.parseDateTime(time);
+      // Date pubDate = SimpleDateFormat.getInstance().parse(time);
+      if (GoogleReader.getLatestTimeMarker() != null && i == 0 && pubDate.getTimeInMillis() <= GoogleReader.getLatestTimeMarker().getTime()) {
+        break;
+      } else if (i == 0) {
+        GoogleReader.setTimeMarker(pubDate.getTime());
       }
-//      if(time == timeMarker)
-//      {
-//    	  break;
-//      }
-//      else
-//      {
       entry.setPublishedAt(getCharacterDataFromElement(line));
-//      }
+
+      NodeList title = element.getElementsByTagName("title");
+      line = (Element) title.item(0);
+      entry.setTitle(getCharacterDataFromElement(line));
 
       UUID uuid = UUID.randomUUID();
       entry.setId(uuid.toString());
-      
       entry.setChannel(channel);
-      
-
 
       NodeList content = element.getElementsByTagName("content");
       line = (Element) content.item(0);
       entry.setContent(getCharacterDataFromElement(line));
-      
+
       NodeList link = element.getElementsByTagName("link");
       line = (Element) link.item(0);
       entry.setLink(line.getAttribute("href"));
-      
-      
-      
+
       NodeList authNode = element.getElementsByTagName("author");
       Element authele = (Element) authNode.item(0);
       NodeList name = authele.getElementsByTagName("name");
@@ -75,15 +72,14 @@ public class XmlParser {
       entry.setAuthor(getCharacterDataFromElement(line));
       String entryJson = gson.toJson(entry);
       listJson.add(entryJson);
-      
+
     }
-    
-    
+
     timeMarker = newTimeMarker;
     String[] jsonString = new String[listJson.size()];
-    listJson.toArray( jsonString );
+    listJson.toArray(jsonString);
     return jsonString;
-    
+
   }
 
   public static String getCharacterDataFromElement(Element e) {
