@@ -62,8 +62,9 @@ public class FeedSpout extends SimpleSpout {
     super.open(conf, context, collector);
     _collector = collector;
     System.out.println("called spout--------------------");
-    // Utils.sleep(3600000); //every one hour
     fetchContent();
+    System.out.println("Sleeping 10 seconds");
+    Utils.sleep(10000);
   }
 
   @Override

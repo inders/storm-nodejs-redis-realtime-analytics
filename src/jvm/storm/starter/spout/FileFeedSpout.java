@@ -73,8 +73,9 @@ public class FileFeedSpout extends SimpleSpout {
     super.open(conf, context, collector);
     _collector = collector;
     System.out.println("called spout--------------------");
-    // Utils.sleep(3600000/60*30);
     fetchContent();
+    System.out.println("Sleeping 1 second");
+    Utils.sleep(1000);
   }
 
   @Override
