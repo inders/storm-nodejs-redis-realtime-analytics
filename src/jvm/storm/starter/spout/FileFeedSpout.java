@@ -63,6 +63,8 @@ public class FileFeedSpout extends SimpleSpout {
     Object nextFeed = feedQueue.poll();
     if (nextFeed != null) {
       _collector.emit(new Values(nextFeed), nextFeed);
+    } else {
+      fetchContent();
     }
   }
 
@@ -72,30 +74,19 @@ public class FileFeedSpout extends SimpleSpout {
     _collector = collector;
     System.out.println("called spout--------------------");
     // Utils.sleep(3600000/60*30);
-    try {
-
-      File dir = new File("feeds");
-      if (dir.isDirectory()) {
-        File[] feedFiles = dir.listFiles();
-        for (File feedFile : feedFiles) {
-          processFile(feedFile);
-          feedFile.delete();
-        }
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    fetchContent();
   }
 
   @Override
   public void ack(Object feedId) {
-    feedQueue.add((String) feedId);
+    //feedQueue.add((String) feedId);
+    feedQueue.remove((String) feedId);
   }
 
   @Override
   public void fail(Object feedId) {
-    feedQueue.add((String) feedId);
+    //feedQueue.add((String) feedId);
+    feedQueue.remove((String) feedId);
   }
 
   @Override
@@ -131,6 +122,22 @@ public class FileFeedSpout extends SimpleSpout {
     for (String feed : listJson) {
       System.out.println(feed);
       feedQueue.add(feed);
+    }
+  }
+  
+  public void fetchContent() {
+    try {
+      File dir = new File("feeds");
+      if (dir.isDirectory()) {
+        File[] feedFiles = dir.listFiles();
+        for (File feedFile : feedFiles) {
+          processFile(feedFile);
+          feedFile.delete();
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
