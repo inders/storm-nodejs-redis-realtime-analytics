@@ -89,17 +89,6 @@ public class FeedSpout extends SimpleSpout {
   public void fetchContent() {
     try {
 
-      // Process processObj =
-      // Runtime.getRuntime().exec("cd /Users/jaydeep.vishwakarma/openproject/storm-nodejs-redis-realtime-analytics/oacurl/ sh run.sh");
-      // InputStream stdin = processObj.getInputStream();
-      // BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
-      // String xmlString = null;
-      //
-      // String line;
-      //
-      // while ((line = reader.readLine()) != null) {
-      // xmlString = xmlString + line;
-      // }
       String channel = "GoogleAlerts";
       String[] feeds = XmlParser.parser(GoogleReader.getFeed("inmobibuzz", "inmobi@123"), "", channel);
       for (String feed : feeds) {
