@@ -43,7 +43,7 @@ io.sockets.on('connection', function(socket) {
         var options = {
           hostname: ES_HOST,
           port: ES_PORT,
-          path: ES_INDEX + '/_search?q=sentiment:' + data.sentiment + '&size=1000',
+          path: ES_INDEX + '/_search?q=sentiment:' + data.sentiment + '&size=10&sort=publishedAt:desc',
           method: 'GET'
         };
         

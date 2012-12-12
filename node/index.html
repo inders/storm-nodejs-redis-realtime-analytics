@@ -68,7 +68,9 @@ div.graph
         for (var i = 0; i < result.hits.total; i++) {
             var hit = result.hits.hits[i];
             var m = hit['_source'];
-            $('#tickLi').append('<li><a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
+            $('#tickLi').append(
+            '<li><span class="pubdate">' + m.publishedAt + ' ' + '</span>' +
+            '<a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
         }
         if (FlashSearchResults) {
             $('#tickList').effect('highlight', {}, 2000);
