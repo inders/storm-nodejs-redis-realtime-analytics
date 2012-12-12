@@ -43,61 +43,61 @@ public class FeedSpout extends SimpleSpout {
   Queue<Object> feedQueue = new LinkedList<Object>();
   String chkTime;
 
-	public FeedSpout() {
-		chkTime="";
-	}
+  public FeedSpout() {
+    chkTime = "";
+  }
 
-	@Override
-	public void nextTuple() {
-		Object nextFeed = feedQueue.poll();
-    if(nextFeed != null) {
+  @Override
+  public void nextTuple() {
+    Object nextFeed = feedQueue.poll();
+    if (nextFeed != null) {
       _collector.emit(new Values(nextFeed), nextFeed);
+    } else {
+      fetchContent();
+//      System.out.println("Sleeping 10 seconds");
+      Utils.sleep(10000);
     }
-	}
+  }
 
-	@Override
-	public void open(Map conf, TopologyContext context, SpoutOutputCollector collector){
-		super.open(conf, context, collector);
+  @Override
+  public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    super.open(conf, context, collector);
     _collector = collector;
     System.out.println("called spout--------------------");
-//    Utils.sleep(3600000); //every one hour
-    try{
-     
-//    Process processObj = Runtime.getRuntime().exec("cd /Users/jaydeep.vishwakarma/openproject/storm-nodejs-redis-realtime-analytics/oacurl/ sh run.sh"); 
-//    InputStream stdin = processObj.getInputStream();
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
-//			String xmlString = null;
-//			
-//			String line;
-//			
-//			while ((line = reader.readLine()) != null) {
-//			      xmlString = xmlString + line;
-//			    }
+    fetchContent();
+    //System.out.println("Sleeping 10 seconds");
+    Utils.sleep(10000);
+  }
+
+  @Override
+  public void ack(Object feedId) {
+    // feedQueue.add((String) feedId);
+    feedQueue.remove(feedId);
+  }
+
+  @Override
+  public void fail(Object feedId) {
+    // feedQueue.add((String) feedId);
+    feedQueue.remove(feedId);
+  }
+
+  @Override
+  public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    declarer.declare(new Fields("feed"));
+  }
+
+  public void fetchContent() {
+    try {
+
       String channel = "GoogleAlerts";
-      String[] feeds = XmlParser.parser(GoogleReader.getFeed("inmobibuzz", "inmobi@123"), "", channel );
-				for(String feed: feeds) {
-				  System.out.println(feed);
-					feedQueue.add(feed);
-				}
-			
-    }catch(Exception e)
-    {
-    	//
+      String[] feeds = XmlParser.parser(GoogleReader.getFeed("inmobibuzz", "inmobi@123"), "", channel);
+      for (String feed : feeds) {
+        System.out.println(feed);
+        feedQueue.add(feed);
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-	}
-	
-	@Override
-	public void ack(Object feedId) {
-		feedQueue.add((String) feedId);
-	}
-
-	@Override
-	public void fail(Object feedId) {
-		feedQueue.add((String) feedId);
-	}
-
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("feed"));
-	}
+  }
 }

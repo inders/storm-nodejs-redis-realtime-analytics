@@ -1,7 +1,7 @@
 #!/bin/bash
 classifierpath=./classifier/inmobi_nbayes.classifier
 mallet=~/src/buzz/mallet-2.0.7/bin/mallet
-tempdir=`mktemp -d XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
+tempdir=`mktemp -d /tmp/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
 echo $1 > $tempdir/pre_stop_words_file.txt
 ./classifier/removestopwords.py $tempdir/pre_stop_words_file.txt > $tempdir/file.txt
 $mallet classify-dir --input $tempdir --classifier $classifierpath --output $tempdir/o.txt

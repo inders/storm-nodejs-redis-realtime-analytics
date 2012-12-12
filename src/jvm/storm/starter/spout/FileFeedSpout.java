@@ -17,7 +17,9 @@ package storm.starter.spout;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
@@ -52,75 +54,93 @@ public class FileFeedSpout extends SimpleSpout {
   String chkTime;
   BufferedReader br = null;
 
-	public FileFeedSpout() {
-		chkTime="";
-	}
+  public FileFeedSpout() {
+    chkTime = "";
+  }
 
-	@Override
-	public void nextTuple() {
-		Object nextFeed = feedQueue.poll();
-    if(nextFeed != null) {
+  @Override
+  public void nextTuple() {
+    Object nextFeed = feedQueue.poll();
+    if (nextFeed != null) {
       _collector.emit(new Values(nextFeed), nextFeed);
+    } else {
+      fetchContent();
+//      System.out.println("Sleeping 1 second");
+      Utils.sleep(1000);
     }
-	}
+  }
 
-	@Override
-	public void open(Map conf, TopologyContext context, SpoutOutputCollector collector){
-		super.open(conf, context, collector);
+  @Override
+  public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    super.open(conf, context, collector);
     _collector = collector;
     System.out.println("called spout--------------------");
-//    Utils.sleep(3600000/60*30);
-    try{
-     
-      String channel = "GoogleAlerts";
-      String sCurrentLine;
-      
-      File inFile = new File("feed.txt");
-      br = new BufferedReader(new FileReader(inFile));
-     
-      ArrayList<String> listJson = new ArrayList<String>();
-      while ((sCurrentLine = br.readLine()) != null) {
-        String[] sCurrentLineArray = sCurrentLine.split("\u0001");
-        Entry entry = new Entry();
-        Gson gson = new Gson();
-        UUID uuid = UUID.randomUUID();
-        entry.setId(uuid.toString());
-        entry.setTitle(sCurrentLineArray[0]);
-        entry.setPublishedAt(sCurrentLineArray[1]);
-        entry.setContent(sCurrentLineArray[2]);
-        entry.setLink(sCurrentLineArray[3]);
-        entry.setAuthor(sCurrentLineArray[4]);
-        entry.setChannel(channel);
-        String entryJson = gson.toJson(entry);
-        listJson.add(entryJson);
-        System.out.println(entryJson);
-      }
-      String[] jsonString = new String[listJson.size()];
-      listJson.toArray( jsonString );
-      
-				for(String feed: listJson) {
-				  System.out.println(feed);
-					feedQueue.add(feed);
-				}
-			
-    }catch(Exception e)
-    {
-    	e.printStackTrace();
+    fetchContent();
+//    System.out.println("Sleeping 1 second");
+    Utils.sleep(1000);
+  }
+
+  @Override
+  public void ack(Object feedId) {
+    //feedQueue.add((String) feedId);
+    feedQueue.remove((String) feedId);
+  }
+
+  @Override
+  public void fail(Object feedId) {
+    //feedQueue.add((String) feedId);
+    feedQueue.remove((String) feedId);
+  }
+
+  @Override
+  public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    declarer.declare(new Fields("feed"));
+  }
+  
+  private void processFile(File inFile) throws IOException {
+    String channel = "GoogleAlerts";
+    String sCurrentLine;
+    br = new BufferedReader(new FileReader(inFile));
+
+    ArrayList<String> listJson = new ArrayList<String>();
+    while ((sCurrentLine = br.readLine()) != null) {
+      String[] sCurrentLineArray = sCurrentLine.split("\u0001");
+      Entry entry = new Entry();
+      Gson gson = new Gson();
+      UUID uuid = UUID.randomUUID();
+      entry.setId(uuid.toString());
+      entry.setTitle(sCurrentLineArray[0]);
+      entry.setPublishedAt(sCurrentLineArray[1]);
+      entry.setContent(sCurrentLineArray[2]);
+      entry.setLink(sCurrentLineArray[3]);
+      entry.setAuthor(sCurrentLineArray[4]);
+      entry.setChannel(channel);
+      String entryJson = gson.toJson(entry);
+      listJson.add(entryJson);
+      System.out.println(entryJson);
     }
-	}
-	
-	@Override
-	public void ack(Object feedId) {
-		feedQueue.add((String) feedId);
-	}
+    String[] jsonString = new String[listJson.size()];
+    listJson.toArray(jsonString);
 
-	@Override
-	public void fail(Object feedId) {
-		feedQueue.add((String) feedId);
-	}
+    for (String feed : listJson) {
+      System.out.println(feed);
+      feedQueue.add(feed);
+    }
+  }
+  
+  public void fetchContent() {
+    try {
+      File dir = new File("feeds");
+      if (dir.isDirectory()) {
+        File[] feedFiles = dir.listFiles();
+        for (File feedFile : feedFiles) {
+          processFile(feedFile);
+          feedFile.delete();
+        }
+      }
 
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("feed"));
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

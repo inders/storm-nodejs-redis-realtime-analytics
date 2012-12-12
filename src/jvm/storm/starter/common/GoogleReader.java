@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.jsoup.Jsoup;
@@ -27,6 +29,10 @@ public class GoogleReader {
   private static final String _TOKEN_URL = _API_URL + "token";
   private static final String _USER_INFO_URL = _API_URL + "user-info";
   private static final String _SUBSCRIPTION_LIST_URL = _API_URL + "subscription/list";
+  private static String _USER_ID = null;
+  private static String _ALERT_ID = null;
+  
+  private static Date currentpublishedAt;
 
   public static String getGoogleAuthKey(String _USERNAME, String _PASSWORD) throws UnsupportedEncodingException, IOException {
     Document doc = Jsoup.connect(_GOOGLE_LOGIN_URL)
@@ -78,14 +84,20 @@ public class GoogleReader {
   }
 
   public static String getFeed(String _USERNAME, String _PASSWORD) throws IOException, JSONException {
-    String stringUrl = "http://www.google.com/alerts/feeds/" + getGoogleUserID(_USERNAME, _PASSWORD) + "/" + getAlertId(_USERNAME, _PASSWORD);
-    System.out.println(stringUrl);
-    URL url = new URL(stringUrl);
-    URLConnection connection = url.openConnection();
-    connection.addRequestProperty("Referer", "www.google.com");
+    if (_USER_ID == null) {
+      getToken(_USERNAME, _PASSWORD);
+    }
+    
+    URLConnection connection = null;
+    try {
+      connection = getConnection();
+    } catch (Exception e) {
+      System.out.println("Token expired requesting for new token");
+      getToken(_USERNAME, _PASSWORD);
+      connection = getConnection();
+    }
 
     String line, xmlString="";
-    StringBuilder builder = new StringBuilder();
     BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
     while ((line = reader.readLine()) != null) {
       xmlString = xmlString + line;
@@ -93,4 +105,25 @@ public class GoogleReader {
     return xmlString;
   }
 
+  private static URLConnection getConnection() throws MalformedURLException, IOException {
+    String stringUrl = "http://www.google.com/alerts/feeds/" + _USER_ID + "/" + _ALERT_ID;
+    System.out.println(stringUrl);
+    URL url = new URL(stringUrl);
+    URLConnection connection = url.openConnection();
+    connection.addRequestProperty("Referer", "www.google.com");
+    return connection;
+  }
+
+  private static void getToken(String _USERNAME, String _PASSWORD) throws UnsupportedEncodingException, IOException {
+    _USER_ID = getGoogleUserID(_USERNAME, _PASSWORD);
+    _ALERT_ID = getAlertId(_USERNAME, _PASSWORD);
+  }
+
+  public synchronized static void setTimeMarker(Date pubAt) {
+    currentpublishedAt = pubAt;
+  }
+  
+  public static Date getLatestTimeMarker() {
+    return currentpublishedAt;
+  }
 }

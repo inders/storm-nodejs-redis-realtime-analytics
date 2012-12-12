@@ -51,7 +51,7 @@ public class MaxEntClassificationBolt extends BaseClassificationBolt {
         return resultArr[0];
       } else {
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        if (errorReader.readLine() != null) {
+        while (errorReader.readLine() != null) {
           System.out.println("ERROR : " + errorReader.readLine());
         }
       }
