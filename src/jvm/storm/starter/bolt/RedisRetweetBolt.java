@@ -58,9 +58,8 @@ public class RedisRetweetBolt extends RedisBolt {
 //	}
 
   @Override
-  public List<Object> publishMessage(String jsonString) {
-    // TODO Auto-generated method stub
-    return null;
+  public boolean publishMessage(String jsonString) {
+    return true;
   }
 
 }

@@ -121,9 +121,8 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 	}
 
   @Override
-  public List<Object> publishMessage(String jsonString) {
-    // TODO Auto-generated method stub
-    return null;
+  public boolean publishMessage(String jsonString) {
+    return true;
   }
 
 }

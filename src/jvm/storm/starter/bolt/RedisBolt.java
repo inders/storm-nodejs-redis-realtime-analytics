@@ -56,17 +56,21 @@ public abstract class RedisBolt implements IRichBolt {
   @Override
   public void execute(Tuple tuple) {
     currentTuple = tuple;
-    List<Object> result = null;
+    boolean result = false;
     try {
       result = publishMessage(tuple.getValue(0).toString());
     } catch(ClassCastException e) {
-      result = publishMessage(null);
+      e.printStackTrace();
+      //result = publishMessage(null);
+      collector.fail(tuple);
     }
-    if(result != null) {
-      for(Object obj: result) {
+    if(result) {
+      /*for(Object obj: result) {
         collector.emit(tuple, new Values(obj));       
-      }
+      }*/
       collector.ack(tuple);
+    } else {
+      collector.fail(tuple);
     }
   }
 
@@ -87,7 +91,7 @@ public abstract class RedisBolt implements IRichBolt {
 
   }
   
-  public abstract List<Object> publishMessage(String string);
+  public abstract boolean publishMessage(String string);
   
   public void publish(String channel, String msg) {
     Jedis jedis = pool.getResource();
