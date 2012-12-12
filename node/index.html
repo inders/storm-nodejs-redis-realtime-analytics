@@ -20,6 +20,21 @@ div.graph
 <body>
 <h3>InMobi Buzz</h3>
 
+<form action="" method="">
+    <label> Select Channel and Sentiment</label>
+    <select name="channel" id="selChannel">
+      <option value="GoogleAlerts" selected="selected">Google Alerts</option>  
+    </select>
+    
+    <select name="sentiment" id="selSentiment">
+        <option value="pos" selected="seleted">Positive</option>
+        <option value="neg">Negative</option>
+        <option value="neut">Neutral</option>
+    </select>
+
+    <input type="submit" value="Search" id="searchBtn" />
+</form>
+
 <div id='channelContainer'>
 </div>
 <br>
@@ -35,7 +50,7 @@ div.graph
     var POS = 'pos';
     var NEG = 'neg';
     var NEUT = 'neutral'
-    var socket = io.connect('http://localhost:8080/');
+    var socket = io.connect(window.location.origin + '/');
     var FlashNewMessage = true;
     var FlashSearchResults = true;
 
@@ -76,6 +91,17 @@ div.graph
             'sentiment' : lbl
         });
     };
+
+    $('#searchBtn').click(function(evt) {
+        var channel = $('#selChannel').val();
+        var sentiment = $('#selSentiment').val();
+        socket.emit('search', {
+            'channel': channel,
+            'sentiment' : sentiment 
+        });
+
+        return false;
+    });
 
 
     var plotHoverCb = function (event, pos, obj) {
