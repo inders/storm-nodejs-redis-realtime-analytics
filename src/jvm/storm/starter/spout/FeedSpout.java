@@ -54,8 +54,8 @@ public class FeedSpout extends SimpleSpout {
       _collector.emit(new Values(nextFeed), nextFeed);
     } else {
       fetchContent();
-//      System.out.println("Sleeping 10 seconds");
-      Utils.sleep(10000);
+//      System.out.println("Sleeping 40 seconds");
+      Utils.sleep(300000);
     }
   }
 
@@ -65,8 +65,8 @@ public class FeedSpout extends SimpleSpout {
     _collector = collector;
     System.out.println("called spout--------------------");
     fetchContent();
-    //System.out.println("Sleeping 10 seconds");
-    Utils.sleep(10000);
+    //System.out.println("Sleeping 40 seconds");
+    Utils.sleep(300000);
   }
 
   @Override
