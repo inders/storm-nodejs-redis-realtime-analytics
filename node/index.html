@@ -1,7 +1,9 @@
 <html>
 <head><title>InMobi Buzz</title></head>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.24/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="http://localhost:8080/static/simplePagination.css"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="static/jquery.simplePagination.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery-ui-1.8.24.custom.min.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.js"></script>
 <script language="javascript" type="text/javascript" src="/static/jquery.flot.pie.js"></script>
@@ -17,6 +19,8 @@ div.graph
 
 
 </style>
+
+<!-- BODY Area -->
 <body>
 <h3>InMobi Buzz</h3>
 
@@ -41,8 +45,8 @@ div.graph
 <div id="latestMessage" class="flash"></div>
 <div id="tickDisplayArea"></div>
 <div id="tickList"></div>
-</div>
-</div>
+<div id="pagination"></div>
+
 
 <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -53,28 +57,53 @@ div.graph
     var socket = io.connect(window.location.origin + '/');
     var FlashNewMessage = true;
     var FlashSearchResults = true;
-
+    var PAGE_SIZE = 10;
+    var Sentiment = '';
+    var Pagenum = 1;
+    
     socket.on('search_results', function (results) {
         var channel = results.channel;
         var label = results.label;
-        
         $('#tickList').empty();
 
-        $('#tickList').append('<div class="chartTitle">Ticks for ' + channel + ' : ' + label + '</div>');
+        $('#tickList').append('<div class="chartTitle">Ticks for ' + channel + ' : ' + label + ', Page: ' +Pagenum+'</div>');
         $('#tickList').append('<ol id="tickLi"></ol>');
         
-        var result = JSON.parse(results.result_body);
-        console.log('Got search results :' + result.hits.total);
-        for (var i = 0; i < result.hits.total; i++) {
-            var hit = result.hits.hits[i];
-            var m = hit['_source'];
-            $('#tickLi').append(
-            '<li><span class="pubdate">' + m.publishedAt + ' ' + '</span>' +
-            '<a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
+        var result = JSON.parse(results.result_body);        
+        for (var i = 0; i < PAGE_SIZE; i++) {
+            var hit = result.hits.hits[i];            
+            if (hit) {
+                var m = hit['_source'];
+                $('#tickLi').append(
+                '<li><span class="pubdate">' + m.publishedAt + ' ' + '</span>' +
+                '<a href="' + m.link + '" target="_blank">' + m.title + '</a></li>');
+            }
         }
         if (FlashSearchResults) {
             $('#tickList').effect('highlight', {}, 2000);
             FlashSearchResults = false;
+        }
+        
+        // Setup pagination for search results
+        if (result.hits.total > PAGE_SIZE) {
+            $('#pagination').pagination({
+                items: result.hits.total,
+                itemsOnPage: PAGE_SIZE,
+                displayedPages: 3,
+                currentPage: Pagenum ,
+                edges: 0,
+                onPageClick: function(pagenum) {
+                    Pagenum = pagenum;
+                    var from = PAGE_SIZE * (pagenum-1);
+                    console.log('FROM : ' + from + ' SENTIMENT=' + Sentiment); 
+                    socket.emit('search', {
+                        'channel': channel,
+                        'sentiment' : label,
+                        'from': from,
+                        'pageSize': PAGE_SIZE
+                    });                
+                }
+            });  
         }   
     });
 
@@ -88,6 +117,7 @@ div.graph
         var channel = selDiv.getAttribute('id').replace("channel_", "");
 
         var lbl = obj.series.label;
+        Sentiment = lbl;
         socket.emit('search', {
             'channel': channel,
             'sentiment' : lbl
@@ -101,10 +131,9 @@ div.graph
             'channel': channel,
             'sentiment' : sentiment 
         });
-
+        Sentiment = sentiment;
         return false;
     });
-
 
     var plotHoverCb = function (event, pos, obj) {
     };
@@ -176,6 +205,8 @@ div.graph
             FlashNewMessage = false;  
          }
     });
+    
+    // Setup pagination
     
     console.log("APP SETUP");
     </script>

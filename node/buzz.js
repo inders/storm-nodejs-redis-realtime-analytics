@@ -24,6 +24,38 @@ var ES_HOST = 'localhost';
 var ES_PORT = 9200;
 var ES_INDEX = 'ticks';
 
+var processFacetResult = function(facetResult) {
+    var sentFacet = facetResult.facets.sentiment;
+    if (sentFacet) {
+        console.log('Got sentiment facet');
+        counts = new Object();
+        counts['channel'] = 'GoogleAlerts';
+        counts[POS] = 0;
+        counts[NEG] = 0;
+        counts[NEUT] = 0;
+        ChannelCounts['GoogleAlerts'] = counts;
+        
+        for (var i = 0; i < sentFacet.terms.length; i++) {
+            var termCount = sentFacet.terms[i];
+            console.log('TermCount:' + termCount.term + '=' + termCount.count);
+            if (counts[termCount.term]) {
+                counts[termCount.term] += termCount.count;
+            } else  {
+                counts[termCount.term] = termCount.count;
+            }
+        }
+    }
+    console.log('Got sentiment counts from ES: ' + JSON.stringify(ChannelCounts));
+    io.sockets.emit('counts', ChannelCounts['GoogleAlerts']);
+};
+
+/** Get initial counts from elasticsearch */
+var exec = require('child_process').exec;
+var getcounts = exec("./getcounts.sh", function(error, stdout, stderr) {
+    console.log('Shell script output:' + stdout);
+    processFacetResult(JSON.parse(stdout));
+});
+
 /** Socket.io **/
 io.sockets.on('connection', function(socket) {
     console.log(' <<<<<< User connected');
@@ -40,10 +72,19 @@ io.sockets.on('connection', function(socket) {
     
     socket.on('search', function(data) {
         console.log('NEW SEARCH REQUEST ' + JSON.stringify(data));
+        var from = 0;
+        if (data.from) {
+            from = data.from;
+        }
+        var size = 10;
+        if (data.pageSize) {
+            size = data.pageSize;
+        }
+        
         var options = {
           hostname: ES_HOST,
           port: ES_PORT,
-          path: ES_INDEX + '/_search?q=sentiment:' + data.sentiment + '&size=10&sort=publishedAt:desc',
+          path: ES_INDEX + '/_search?q=sentiment:' + data.sentiment + '&size='+size+'&sort=publishedAt:desc&from='+from,
           method: 'GET'
         };
         
