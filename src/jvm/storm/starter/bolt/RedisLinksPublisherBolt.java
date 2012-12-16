@@ -127,9 +127,9 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 	}
 
   @Override
-  public List<Object> publishMessage(String jsonString) {
+  public boolean publishMessage(String jsonString) {
     // TODO Auto-generated method stub
-    return null;
+    return true;
   }
 	
 }

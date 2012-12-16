@@ -31,21 +31,23 @@ public class ImobiSentimentBolt extends RedisBolt implements OnDynamicConfigurat
   }
 
   @Override
-  public List<Object> publishMessage(String string) {
+  public boolean publishMessage(String string) {
     Gson gson = new Gson();
     String jsonString = (String) currentTuple.getValue(0);
     if (jsonString == null) {
-      return null;
+      return false;
     }
 
     try {
       Entry entry = gson.fromJson(jsonString, Entry.class);
       System.out.println("Title : " + entry.getTitle() + " Publihsed At : " + entry.getPublishedAt());
       publish(entry.getChannel(), jsonString);
+      return true;
     } catch (Exception e) {
-      return null;
+      e.printStackTrace();
     }
-    return null;
+
+    return false;
   }
 
   @Override
